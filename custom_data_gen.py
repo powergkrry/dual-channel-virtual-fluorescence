@@ -8,18 +8,19 @@ Created on Mon Oct 18 19:58:19 2021
 
 
 import os
-import cv2 as cv
-from tensorflow import keras
 import numpy as np
+from tensorflow import keras
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
-
-# paths=[['2021_10_08','00'],['2021_10_08','01'],['2021_10_08','03'],['2021_10_08','04'],['2021_10_08','05'],['2021_10_08','06'],['2021_10_08','08'],['2021_10_08','09'],['2021_10_08','10'],['2021_10_08','11'],['2021_10_08','12'],['2021_10_08','13'],['2021_10_08','14']]
 
 class DataGenerator(keras.utils.Sequence):
-    def __init__(self, list_IDs, base_path='/home/kanghyun/Desktop/', batch_size=16, crop_size=256, n_in_channels=21, n_out_channels=1, shuffle=True, random_seed=0):
+    def __init__(self, num_images, base_path='/home/kanghyun/Desktop/Data/', is_train=True, is_green=True, batch_size=16, crop_size=256, n_in_channels=21, n_out_channels=1, shuffle=True, random_seed=0):
         self.crop_size = crop_size
-        self.list_IDs = np.repeat(list_IDs,np.power(2048//self.crop_size,2),axis=0)
+        self.num_images = num_images
         self.base_path = base_path
+        self.is_train = is_train
+        self.augmentor = ImageDataGenerator(horizontal_flip=True,vertical_flip=True) if is_train else ImageDataGenerator()
+        self.is_green = is_green
         self.batch_size = batch_size
         self.n_in_channels = n_in_channels
         self.n_out_channels = n_out_channels
@@ -30,35 +31,26 @@ class DataGenerator(keras.utils.Sequence):
     
     def __getitem__(self, index):
         indexes = self.indexes[index*self.batch_size:(index+1)*self.batch_size]
-        list_IDs_temp = [self.list_IDs[k] for k in indexes]
-        X, y = self.__data_generation(list_IDs_temp, indexes)
+        X, y = self.__data_generation(indexes)
         return X, y
     
     def __len__(self):
-        return int(np.floor(len(self.list_IDs) / self.batch_size))
+        return int(np.floor(self.num_images / self.batch_size))
     
     def on_epoch_end(self):
-        self.indexes = np.arange(len(self.list_IDs))
+        self.indexes = np.arange(self.num_images)
         if self.shuffle == True:
             np.random.shuffle(self.indexes)
     
-    def __data_generation(self, list_IDs_temp, indexes):
+    def __data_generation(self, indexes):
         X = np.empty((self.batch_size, self.crop_size, self.crop_size, self.n_in_channels))
         y = np.empty((self.batch_size, self.crop_size, self.crop_size, self.n_out_channels))
-
-        for i, ID in enumerate(list_IDs_temp):
-            row_pos = indexes[i]%np.power(2048//self.crop_size,2) // self.crop_size
-            col_pos = indexes[i]%np.power(2048//self.crop_size,2) % self.crop_size
-            
-            for led in range(self.n_in_channels):
-                image = cv.imread(os.path.join(self.base_path, f'{ID[0]}/TB/{ID[1]}/cropped_LED_{led:03d}.tif'), cv.IMREAD_ANYDEPTH)
-                image = (image - np.min(image)) / (np.max(image) - np.min(image))
-                X[i,:,:,led] = image[row_pos:row_pos+self.crop_size, col_pos:col_pos+self.crop_size]
-            image = cv.imread(os.path.join(self.base_path, f'{ID[0]}/TB/{ID[1]}/cropped_red_flu_AIF.tif'), cv.IMREAD_ANYDEPTH)
-            low = np.percentile(image, 5)
-            high = np.percentile(image, 99.99)
-            image = (image - np.min(low)) / (np.max(high) - np.min(low))
-            image = np.clip(np.array(image), 0, 1)
-            y[i,:,:,0] = image[row_pos:row_pos+self.crop_size, col_pos:col_pos+self.crop_size]
-
-        return X, y
+        
+        for i, ID in enumerate(indexes):
+            train_test = 'train' if self.is_train else 'test'
+            green_red = 'green' if self.is_green else 'red'
+            X[i] = np.load(os.path.join(self.base_path, train_test, f'cropped_LED_array_{ID:04d}_{train_test}.npy'), mmap_mode='r')
+            y[i] = np.load(os.path.join(self.base_path, train_test, f'cropped_{green_red}_flu_AIF_array_{ID:04d}_{train_test}.npy'), mmap_mode='r')
+        
+        X_gen = self.augmentor.flow(X, batch_size=self.batch_size, shuffle=False)
+        return next(X_gen), y
