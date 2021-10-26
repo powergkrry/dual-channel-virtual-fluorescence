@@ -14,7 +14,17 @@ from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
 
 class DataGenerator(keras.utils.Sequence):
-    def __init__(self, num_images, base_path='/home/kanghyun/Desktop/Data/', is_train=True, is_green=True, batch_size=16, crop_size=256, n_in_channels=21, n_out_channels=1, shuffle=True, random_seed=0):
+    def __init__(self,
+                 num_images,
+                 base_path='/home/kanghyun/Desktop/Data/',
+                 is_train=True,
+                 is_green=True,
+                 batch_size=16,
+                 crop_size=256,
+                 n_in_channels=21,
+                 n_out_channels=1,
+                 shuffle=True,
+                 random_seed=0):
         self.crop_size = crop_size
         self.num_images = num_images
         self.base_path = base_path
@@ -52,5 +62,7 @@ class DataGenerator(keras.utils.Sequence):
             X[i] = np.load(os.path.join(self.base_path, train_test, f'cropped_LED_array_{ID:04d}_{train_test}.npy'), mmap_mode='r')
             y[i] = np.load(os.path.join(self.base_path, train_test, f'cropped_{green_red}_flu_AIF_array_{ID:04d}_{train_test}.npy'), mmap_mode='r')
         
-        X_gen = self.augmentor.flow(X, batch_size=self.batch_size, shuffle=False)
-        return next(X_gen), y
+        Xy = np.concatenate((X, y), axis=3)
+        Xy_gen = self.augmentor.flow(Xy, batch_size=self.batch_size, shuffle=False)
+        Xy = next(Xy_gen)
+        return Xy[...,:self.n_in_channels], Xy[...,self.n_in_channels:]
