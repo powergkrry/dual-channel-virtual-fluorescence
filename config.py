@@ -24,7 +24,7 @@ data_arg.add_argument('--shuffle', type=str2bool, default=True,
 
 # training params
 train_arg = add_argument_group('Training Params')
-train_arg.add_argument('--epochs', type=int, default=20,
+train_arg.add_argument('--epochs', type=int, default=5,
                        help='# of epochs to train for')
 train_arg.add_argument('--init_lr', type=float, default=1e-3,
                        help='Initial learning rate value')
@@ -34,6 +34,8 @@ train_arg.add_argument('--init_lr', type=float, default=1e-3,
 misc_arg = add_argument_group('Misc.')
 misc_arg.add_argument('--random_seed', type=int, default=0,
                       help='Seed to ensure reproducibility')
+misc_arg.add_argument('--n_sample', type=int, default=10,
+                      help='Number of subsample')
 misc_arg.add_argument('--n_out_channels', type=int, default=1,
                       help='Number of fluorescence channel')
 
