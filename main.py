@@ -5,7 +5,7 @@ Created on Tue Oct 19 19:12:56 2021
 
 @author: kanghyun
 """
-
+#%%
 import os
 import model
 import tensorflow as tf
@@ -86,7 +86,7 @@ model.fit(traingen,
           workers=8)
 
 #%%
-model.layers[1].trainable = True
+# model.layers[1].trainable = True
 model.compile(loss=blur_mse_loss, optimizer=optimizer)
 model.fit(traingen,
           validation_data=testgen,
