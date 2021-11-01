@@ -59,10 +59,16 @@ def blur_mse_loss(y_true, y_pred):
     kernel_size = 5
     std=3
     
-    kernel = tf.constant(gaussian_kernel(kernel_size=kernel_size, std=std), shape=[kernel_size, kernel_size, 1, 1], dtype=tf.float32)
+    kernel = tf.constant(gaussian_kernel(kernel_size=kernel_size, std=std),
+                                         shape=[kernel_size,
+                                                kernel_size,
+                                                1, 1],
+                                         dtype=tf.float32)
     
-    blurred_y_true = tf.nn.conv2d(y_true, kernel, strides=(1,1), padding="SAME")
-    blurred_y_pred = tf.nn.conv2d(y_pred, kernel, strides=(1,1), padding="SAME")
+    blurred_y_true = tf.nn.conv2d(y_true, kernel, 
+                                  strides=(1,1), padding="SAME")
+    blurred_y_pred = tf.nn.conv2d(y_pred, kernel, 
+                                  strides=(1,1), padding="SAME")
     
     loss = tf.math.square(blurred_y_true - blurred_y_pred)
     loss = tf.reduce_mean(loss, axis=-1)
@@ -84,7 +90,7 @@ model.layers[1].trainable = True
 model.compile(loss=blur_mse_loss, optimizer=optimizer)
 model.fit(traingen,
           validation_data=testgen,
-          epochs=1,#config.epochs,
+          epochs=1,  #config.epochs,
           shuffle=False,
           workers=8)
 
@@ -92,21 +98,21 @@ model.fit(traingen,
 index = 1
 preds = model.predict(testgen[index])
 
-fig, axs = plt.subplots(nrows=3, ncols=8) # , figsize=(16,len(indices)*4)
+fig, axs = plt.subplots(nrows=3, ncols=8)  # , figsize=(16,len(indices)*4)
 counter = 0
 for i in range(8):
     ax = axs[0,counter]
     ax.axis('off')
-    ax.imshow(testgen[index][0][i,:,:,0], cmap='gray') # , vmax=0.8
+    ax.imshow(testgen[index][0][i,:,:,0], cmap='gray')  # , vmax=0.8
     ax.set_title(f"Center {counter}")
     ax = axs[1,counter]
     ax.axis('off')
-    ax.imshow(testgen[index][1][i,:,:,0], vmin=0.01, vmax=0.4) # 
+    ax.imshow(testgen[index][1][i,:,:,0], vmin=0.01, vmax=0.4)
     ax.set_title(f"Ground Truth Green {counter}")
     ax = axs[2,counter]
     ax.axis('off')
     ax.set_title(f"Prediction Green {counter}")
-    ax.imshow(preds[i], vmin=0.01, vmax=0.4) # , vmin=0.01, vmax=1
+    ax.imshow(preds[i], vmin=0.01, vmax=0.4)  # , vmin=0.01, vmax=1
     counter += 1
     
 #%%

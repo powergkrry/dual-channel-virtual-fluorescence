@@ -7,6 +7,8 @@ from tensorflow.keras import layers
 
 
 class ProbsApproxCatMultiLayer(layers.Layer):
+
+
     def __init__(self, mux_in, mux_out):
         super(ProbsApproxCatMultiLayer, self).__init__()
         self.mux_in = mux_in
@@ -20,22 +22,30 @@ class ProbsApproxCatMultiLayer(layers.Layer):
                                       trainable=True) # TODO
         self.temperature = 1.0#tf.Variable(initial_value=1.0, trainable=True)
 
+
     @tf.function
     def sampling(self, BS):
-        GN = -tf.math.log(-tf.math.log(tf.random.uniform((BS,1,self.mux_in),0,1)+1e-20)+1e-20)
+        distribution = tf.random.uniform((BS,1,self.mux_in), 0, 1) + 1e-20
+        GN = -tf.math.log(-tf.math.log(distribution)+1e-20)
         perturbedLog = self.logits + GN
-        
-        topk = tf.squeeze(tf.nn.top_k(perturbedLog, k=self.mux_out)[1],axis=1) # [BS,mux_out]
-        hardSamples = tf.one_hot(topk,depth=self.mux_in) # [BS,mux_out,mux_in]
-        
-        prob_exp = tf.tile(tf.expand_dims(tf.math.exp(self.logits),0),(BS,self.mux_out,1)) # [BS,mux_out,mux_in]
-        cumMask = tf.cumsum(hardSamples,axis=-2, exclusive=True) # [BS,mux_out,mux_in]
-        
-        softSamples = tf.nn.softmax((tf.math.log(tf.math.multiply(prob_exp,1-cumMask+1e-20))+tf.tile(GN,(1,self.mux_out,1)))/self.temperature, axis=-1)
-        self.temperature = tf.clip_by_value(self.temperature, 0, 2) # TODO
-        
-        return tf.math.reduce_sum(tf.stop_gradient(hardSamples - softSamples) + softSamples, axis=1)
-    
+
+        topk = tf.squeeze(tf.nn.top_k(perturbedLog, k=self.mux_out)[1],
+                          axis=1)  # [BS,mux_out]
+        hardSamples = tf.one_hot(topk,depth=self.mux_in)  # [BS,mux_out,mux_in]
+
+        prob_exp = tf.tile(tf.expand_dims(tf.math.exp(self.logits), 0),
+                           (BS,self.mux_out, 1))  # [BS,mux_out,mux_in]
+        cumMask = tf.cumsum(hardSamples,axis=-2, 
+                            exclusive=True)  # [BS,mux_out,mux_in]
+
+        softSamples = tf.nn.softmax((tf.math.log(tf.math.multiply(prob_exp, 1-cumMask+1e-20))+
+                                     tf.tile(GN, (1, self.mux_out, 1)))/self.temperature, axis=-1)
+        self.temperature = tf.clip_by_value(self.temperature, 0, 2)  # TODO
+
+        return tf.math.reduce_sum(tf.stop_gradient(hardSamples - softSamples) 
+                                  + softSamples, axis=1)
+
+
     @tf.function
     def call(self, inputs):
         BS = tf.shape(inputs)[0]
@@ -43,6 +53,7 @@ class ProbsApproxCatMultiLayer(layers.Layer):
         outputs = tf.math.multiply(inputs, tf.reshape(choice, (-1, 1, 1, self.mux_in)))
 
         return outputs
+
 
 def attention_gate(inp_1, inp_2, n_intermediate_filters):
     inp_1_conv = layers.Conv2D(n_intermediate_filters,
@@ -67,7 +78,9 @@ def attention_gate(inp_1, inp_2, n_intermediate_filters):
 
 def attention_concat(conv_below, skip_connection):
     below_filters = conv_below.get_shape().as_list()[-1]
-    attention_across = attention_gate(skip_connection, conv_below, below_filters)
+    attention_across = attention_gate(skip_connection,
+                                      conv_below,
+                                      below_filters)
     return layers.concatenate([conv_below, attention_across])
 
 
@@ -102,12 +115,13 @@ def get_model(img_size,
               use_batch_norm=True):
     inputs = keras.Input(shape=img_size + (21,))
     x = inputs
-    
-    #x = ProbsApproxCatMultiLayer(21, n_sample)(x)
+
+    # x = ProbsApproxCatMultiLayer(21, n_sample)(x)
 
     down_layers = []
     for l in range(num_layers):
-        x = conv2d_block(inputs=x, filters=filters, use_batch_norm=use_batch_norm)
+        x = conv2d_block(inputs=x, filters=filters,
+                         use_batch_norm=use_batch_norm)
         down_layers.append(x)
         x = layers.MaxPooling2D(2)(x)
         filters = filters * 2
@@ -116,12 +130,15 @@ def get_model(img_size,
 
     for conv in reversed(down_layers):
         filters //= 2
-        x = layers.Conv2DTranspose(filters, (2, 2), strides=(2, 2), padding="same")(x)
+        x = layers.Conv2DTranspose(filters, (2, 2),
+                                   strides=(2, 2), padding="same")(x)
         x = attention_concat(conv_below=x, skip_connection=conv)
         # x = layers.concatenate([x, conv], axis=3)
-        x = conv2d_block(inputs=x, filters=filters, use_batch_norm=use_batch_norm)
+        x = conv2d_block(inputs=x, filters=filters,
+                         use_batch_norm=use_batch_norm)
 
-    outputs = layers.Conv2D(n_out_channels, (1, 1), activation="relu")(x) # TODO
-    
+    outputs = layers.Conv2D(n_out_channels, (1, 1), activation="relu")(x) 
+    # TODO
+
     model = keras.Model(inputs, outputs)
     return model
