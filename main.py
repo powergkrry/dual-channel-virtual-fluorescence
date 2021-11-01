@@ -20,7 +20,7 @@ from scipy import signal
 import matplotlib.pyplot as plt
 
 os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"]="0"
+os.environ["CUDA_VISIBLE_DEVICES"]="1"
 os.environ['TF_FORCE_GPU_ALLOW_GROWTH'] = 'true'
 
 
