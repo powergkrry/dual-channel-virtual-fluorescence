@@ -16,15 +16,17 @@ def add_argument_group(name):
 
 # data params
 data_arg = add_argument_group('Data Params')
-data_arg.add_argument('--batch_size', type=int, default=8,
+data_arg.add_argument('--batch_size', type=int, default=16,
                       help='# of images in each batch of data')
+data_arg.add_argument('--is_green', type=int, default=0,
+                      help='Green or Red channel')
 data_arg.add_argument('--shuffle', type=str2bool, default=True,
                       help='Whether to shuffle the train and valid indices')
 
 
 # training params
 train_arg = add_argument_group('Training Params')
-train_arg.add_argument('--epochs', type=int, default=5,
+train_arg.add_argument('--epochs', type=int, default=40,
                        help='# of epochs to train for')
 train_arg.add_argument('--init_lr', type=float, default=1e-3,
                        help='Initial learning rate value')
@@ -34,7 +36,7 @@ train_arg.add_argument('--init_lr', type=float, default=1e-3,
 misc_arg = add_argument_group('Misc.')
 misc_arg.add_argument('--random_seed', type=int, default=0,
                       help='Seed to ensure reproducibility')
-misc_arg.add_argument('--n_sample', type=int, default=10,
+misc_arg.add_argument('--n_sample', type=int, default=21,
                       help='Number of subsample')
 misc_arg.add_argument('--n_out_channels', type=int, default=1,
                       help='Number of fluorescence channel')
