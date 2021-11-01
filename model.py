@@ -103,7 +103,7 @@ def get_model(img_size,
     inputs = keras.Input(shape=img_size + (21,))
     x = inputs
     
-    x = ProbsApproxCatMultiLayer(21, n_sample)(x)
+    #x = ProbsApproxCatMultiLayer(21, n_sample)(x)
 
     down_layers = []
     for l in range(num_layers):
