@@ -132,8 +132,8 @@ def get_model(img_size,
         filters //= 2
         x = layers.Conv2DTranspose(filters, (2, 2),
                                    strides=(2, 2), padding="same")(x)
-        x = attention_concat(conv_below=x, skip_connection=conv)
-        # x = layers.concatenate([x, conv], axis=3)
+        # x = attention_concat(conv_below=x, skip_connection=conv)
+        x = layers.concatenate([x, conv], axis=3)
         x = conv2d_block(inputs=x, filters=filters,
                          use_batch_norm=use_batch_norm)
 
