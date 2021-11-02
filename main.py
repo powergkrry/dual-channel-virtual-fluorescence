@@ -58,7 +58,7 @@ def gaussian_kernel(kernel_size, std):
     return gkern2d/np.power(kernel_size, 2)
 
 def blur_mse_loss(y_true, y_pred):
-    kernel_size = 5
+    kernel_size = 7
     std=1
     
     kernel = tf.constant(gaussian_kernel(kernel_size=kernel_size, std=std),
@@ -72,13 +72,14 @@ def blur_mse_loss(y_true, y_pred):
     blurred_y_pred = tf.nn.conv2d(y_pred, kernel, 
                                   strides=(1,1), padding="SAME")
     
-    loss = tf.math.square(blurred_y_true - blurred_y_pred)
-    loss = tf.reduce_mean(loss, axis=-1)
-    return loss
+    l2loss = keras.losses.mean_squared_error(blurred_y_true, blurred_y_pred)
+    
+    l1loss = tf.norm(y_pred, ord=1)
+    return l2loss + l1loss
 
 
 #%%
-model.compile(loss='MSE', optimizer=optimizer)
+model.compile(loss='MSE', optimizer=optimizer, metrics=['mse'])
 # model.compile(loss=blur_mse_loss, optimizer=optimizer)
 # model.summary()
 
@@ -90,13 +91,13 @@ model.fit(traingen,
 
 #%%
 # model.layers[1].trainable = True
-model.compile(loss=blur_mse_loss, optimizer=optimizer)
+model.compile(loss=blur_mse_loss, optimizer=optimizer, metrics=[blur_mse_loss])
 history = model.fit(traingen,
           validation_data=testgen,
           epochs=40,  #config.epochs,
           shuffle=True,
           workers=8)
-plot_acc(history)
+plot_acc(history, "blur_mse_loss")
 
 #%%
 index = 5
@@ -118,7 +119,7 @@ for i in range(8):
     ax.set_title(f"Prediction Green {counter}")
     ax.imshow(preds[i], vmin=0.01, vmax=0.4)  # , vmin=0.01, vmax=1
     counter += 1
-    
+plt.show()
 #%%
 index = 12
 
