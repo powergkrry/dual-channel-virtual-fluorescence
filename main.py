@@ -50,7 +50,7 @@ learning_rate_fn = keras.optimizers.schedules.PolynomialDecay(
     decay_steps=10000,
     end_learning_rate=config.init_lr/10,
     power=0.5)
-optimizer = keras.optimizers.RMSprop(learning_rate=learning_rate_fn)
+optimizer = keras.optimizers.adam(learning_rate=learning_rate_fn)
 
 def gaussian_kernel(kernel_size, std):
     gkern1d = signal.gaussian(kernel_size, std=std).reshape(kernel_size, 1)
