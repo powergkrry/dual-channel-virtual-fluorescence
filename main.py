@@ -75,8 +75,8 @@ def blur_mse_loss(y_true, y_pred):
     
     l2loss = keras.losses.mean_squared_error(blurred_y_true, blurred_y_pred)
     
-    l1loss = tf.keras.regularizers.L1()(y_pred)
-    return l2loss +0.01*l1loss
+    # l1loss = keras.losses.mean_absolute_error(y_pred, tf.zeros_like(y_pred))
+    return l2loss  #l1loss
 
 
 #%%
@@ -101,7 +101,7 @@ model.compile(loss=blur_mse_loss, optimizer=optimizer, metrics=[blur_mse_loss])
 history = model.fit(traingen,
           validation_data=testgen,
           epochs=100,  #config.epochs,
-          shuffle=True,
+          shuffle=False,
           workers=8,
           callbacks=[reduce_lr])
 plot_acc(history, "blur_mse_loss")
