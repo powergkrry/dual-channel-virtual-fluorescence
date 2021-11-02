@@ -110,7 +110,7 @@ plot_acc(history, "blur_mse_loss")
 index = 5
 preds = model.predict(testgen[index][0])
 
-fig, axs = plt.subplots(nrows=3, ncols=8)  # , figsize=(16,len(indices)*4)
+fig, axs = plt.subplots(nrows=3, ncols=8, figsize=(16, 12))
 counter = 0
 for i in range(8):
     ax = axs[0,counter]
