@@ -19,6 +19,8 @@ from scipy import signal
 
 import matplotlib.pyplot as plt
 
+from plotting import plot_acc
+
 os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"
 os.environ["CUDA_VISIBLE_DEVICES"]="1"
 os.environ['TF_FORCE_GPU_ALLOW_GROWTH'] = 'true'
@@ -89,11 +91,12 @@ model.fit(traingen,
 #%%
 # model.layers[1].trainable = True
 model.compile(loss=blur_mse_loss, optimizer=optimizer)
-model.fit(traingen,
+history = model.fit(traingen,
           validation_data=testgen,
-          epochs=1,  #config.epochs,
-          shuffle=False,
+          epochs=40,  #config.epochs,
+          shuffle=True,
           workers=8)
+plot_acc(history)
 
 #%%
 index = 5
