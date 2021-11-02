@@ -57,7 +57,7 @@ def gaussian_kernel(kernel_size, std):
 
 def blur_mse_loss(y_true, y_pred):
     kernel_size = 5
-    std=3
+    std=1
     
     kernel = tf.constant(gaussian_kernel(kernel_size=kernel_size, std=std),
                                          shape=[kernel_size,
@@ -74,11 +74,12 @@ def blur_mse_loss(y_true, y_pred):
     loss = tf.reduce_mean(loss, axis=-1)
     return loss
 
+
+#%%
 model.compile(loss='MSE', optimizer=optimizer)
 # model.compile(loss=blur_mse_loss, optimizer=optimizer)
 # model.summary()
 
-#%%
 model.fit(traingen,
           validation_data=testgen,
           epochs=config.epochs,
@@ -95,8 +96,8 @@ model.fit(traingen,
           workers=8)
 
 #%%
-index = 1
-preds = model.predict(testgen[index])
+index = 5
+preds = model.predict(testgen[index][0])
 
 fig, axs = plt.subplots(nrows=3, ncols=8)  # , figsize=(16,len(indices)*4)
 counter = 0
