@@ -75,11 +75,16 @@ def blur_mse_loss(y_true, y_pred):
     
     l2loss = keras.losses.mean_squared_error(blurred_y_true, blurred_y_pred)
     
-    # l1loss = keras.losses.mean_absolute_error(y_pred, tf.zeros_like(y_pred))
-    return l2loss  #l1loss
+    l1loss = keras.losses.mean_absolute_error(y_pred, tf.zeros_like(y_pred))
+    return l2loss+ 10e-4*l1loss
 
 
 #%%
+reduce_lr = tf.keras.callbacks.ReduceLROnPlateau(monitor='val_loss',
+                                                 factor=0.1,
+                                                 patience=5,
+                                                 min_delta=5e-4,
+                                                 min_lr=0.000001)
 model.compile(loss='MSE', optimizer=optimizer, metrics=['mse'])
 # model.compile(loss=blur_mse_loss, optimizer=optimizer)
 # model.summary()
@@ -107,7 +112,7 @@ history = model.fit(traingen,
 plot_acc(history, "blur_mse_loss")
 
 #%%
-index = 5
+index = 6
 preds = model.predict(testgen[index][0])
 
 fig, axs = plt.subplots(nrows=3, ncols=8, figsize=(16, 12))
