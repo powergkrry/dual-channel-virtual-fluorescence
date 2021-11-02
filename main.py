@@ -94,7 +94,7 @@ model.fit(traingen,
 model.compile(loss=blur_mse_loss, optimizer=optimizer, metrics=[blur_mse_loss])
 history = model.fit(traingen,
           validation_data=testgen,
-          epochs=40,  #config.epochs,
+          epochs=100,  #config.epochs,
           shuffle=True,
           workers=8)
 plot_acc(history, "blur_mse_loss")
