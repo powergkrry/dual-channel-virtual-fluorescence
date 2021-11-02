@@ -74,7 +74,7 @@ def blur_mse_loss(y_true, y_pred):
     
     l2loss = keras.losses.mean_squared_error(blurred_y_true, blurred_y_pred)
     
-    l1loss = tf.norm(y_pred, ord=1)
+    l1loss = tf.keras.regularizers.L1()(y_pred)
     return l2loss + l1loss
 
 
