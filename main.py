@@ -107,8 +107,8 @@ history = model.fit(traingen,
           validation_data=testgen,
           epochs=60,  #config.epochs,
           shuffle=False,
-          workers=8,
-          callbacks=[])
+          workers=8)
+          #callbacks=[])
 plot_acc(history, "blur_mse_loss")
 
 #%%
