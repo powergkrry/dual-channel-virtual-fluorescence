@@ -45,11 +45,11 @@ testgen = DataGenerator(num_images=128,
 #%%
 model = model.get_model((256,256), config.n_sample, config.n_out_channels)
 # model.layers[1].trainable = False
-# learning_rate_fn = keras.optimizers.schedules.PolynomialDecay(
-#     initial_learning_rate=config.init_lr,
-#     decay_steps=10000,
-#     end_learning_rate=config.init_lr/10,
-#     power=0.5)
+learning_rate_fn = keras.optimizers.schedules.PolynomialDecay(
+    initial_learning_rate=config.init_lr,
+    decay_steps=10000,
+    end_learning_rate=config.init_lr/100,
+    power=0.5)
 optimizer = tf.keras.optimizers.Adam(
     learning_rate=0.001, beta_1=0.9, beta_2=0.999, epsilon=1e-07)
 
@@ -97,11 +97,11 @@ model.fit(traingen,
 
 #%%
 # model.layers[1].trainable = True
-reduce_lr = tf.keras.callbacks.ReduceLROnPlateau(monitor='val_loss',
-                                                 factor=0.1,
-                                                 patience=5,
-                                                 min_delta=5e-4,
-                                                 min_lr=0.000001)
+# reduce_lr = tf.keras.callbacks.ReduceLROnPlateau(monitor='val_loss',
+#                                                  factor=0.1,
+#                                                  patience=5,
+#                                                  min_delta=5e-4,
+#                                                  min_lr=0.000001)
 model.compile(loss=blur_mse_loss, optimizer=optimizer, metrics=[blur_mse_loss])
 history = model.fit(traingen,
           validation_data=testgen,
