@@ -30,6 +30,8 @@ train_arg.add_argument('--epochs', type=int, default=40,
                        help='# of epochs to train for')
 train_arg.add_argument('--init_lr', type=float, default=1e-3,
                        help='Initial learning rate value')
+train_arg.add_argument('--final_activation', type=str, default="swish",
+                       help='Initial learning rate value')
 
 
 # other params
