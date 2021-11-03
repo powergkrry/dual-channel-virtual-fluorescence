@@ -141,7 +141,7 @@ def get_model(img_size,
 
     outputs = layers.Conv2D(n_out_channels, (1, 1), activation="swish")(x)
     # TODO
-    outputs = outputs/2 + 0.5
+    # outputs = outputs/2 + 0.5
 
     model = keras.Model(inputs, outputs)
     return model
