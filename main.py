@@ -60,7 +60,7 @@ def gaussian_kernel(kernel_size, std):
 
 def blur_mse_loss(y_true, y_pred):
     kernel_size = 7
-    std=1
+    std = 1
     
     kernel = tf.constant(gaussian_kernel(kernel_size=kernel_size, std=std),
                                          shape=[kernel_size,
@@ -76,7 +76,7 @@ def blur_mse_loss(y_true, y_pred):
     l2loss = keras.losses.mean_squared_error(blurred_y_true, blurred_y_pred)
     
     l1loss = keras.losses.mean_absolute_error(y_pred, tf.zeros_like(y_pred))
-    return l2loss+ 10e-4*l1loss
+    return l2loss+ 1e-5*l1loss
 
 
 #%%
@@ -105,14 +105,14 @@ reduce_lr = tf.keras.callbacks.ReduceLROnPlateau(monitor='val_loss',
 model.compile(loss=blur_mse_loss, optimizer=optimizer, metrics=[blur_mse_loss])
 history = model.fit(traingen,
           validation_data=testgen,
-          epochs=100,  #config.epochs,
+          epochs=60,  #config.epochs,
           shuffle=False,
           workers=8,
           callbacks=[reduce_lr])
 plot_acc(history, "blur_mse_loss")
 
 #%%
-index = 6
+index = 1
 preds = model.predict(testgen[index][0])
 
 fig, axs = plt.subplots(nrows=3, ncols=8, figsize=(16, 12))
