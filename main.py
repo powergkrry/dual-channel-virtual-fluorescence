@@ -51,7 +51,7 @@ learning_rate_fn = keras.optimizers.schedules.PolynomialDecay(
     end_learning_rate=config.init_lr/100,
     power=0.5)
 optimizer = tf.keras.optimizers.Adam(
-    learning_rate=0.001, beta_1=0.9, beta_2=0.999, epsilon=1e-07)
+    learning_rate=learning_rate_fn, beta_1=0.9, beta_2=0.999, epsilon=1e-07)
 
 def gaussian_kernel(kernel_size, std):
     gkern1d = signal.gaussian(kernel_size, std=std).reshape(kernel_size, 1)
@@ -108,7 +108,7 @@ history = model.fit(traingen,
           epochs=60,  #config.epochs,
           shuffle=False,
           workers=8,
-          callbacks=[reduce_lr])
+          callbacks=[])
 plot_acc(history, "blur_mse_loss")
 
 #%%
