@@ -139,7 +139,7 @@ def get_model(img_size,
         x = conv2d_block(inputs=x, filters=filters,
                          use_batch_norm=use_batch_norm)
 
-    outputs = layers.Conv2D(n_out_channels, (1, 1), activation="relu")(x)
+    outputs = layers.Conv2D(n_out_channels, (1, 1), activation="swish")(x)
     # TODO
 
     model = keras.Model(inputs, outputs)
