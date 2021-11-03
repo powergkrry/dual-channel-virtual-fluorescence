@@ -19,7 +19,7 @@ from scipy import signal
 
 import matplotlib.pyplot as plt
 
-from plotting import plot_acc
+from plotting import plot_acc, plot_predictions
 
 os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"
 os.environ["CUDA_VISIBLE_DEVICES"]="1"
@@ -28,6 +28,7 @@ os.environ['TF_FORCE_GPU_ALLOW_GROWTH'] = 'true'
 
 #%%
 config, unparsed = get_config()
+
 traingen = DataGenerator(num_images=704,
                          is_green=config.is_green,
                          batch_size=config.batch_size,
@@ -43,20 +44,24 @@ testgen = DataGenerator(num_images=128,
                         random_seed=config.random_seed)
 
 #%%
-model = model.get_model((256,256), config.n_sample, config.n_out_channels)
-# model.layers[1].trainable = False
+model = model.get_model((256,256), config.n_sample, config.n_out_channels,
+                        config.final_activation)
+
 learning_rate_fn = keras.optimizers.schedules.PolynomialDecay(
     initial_learning_rate=config.init_lr,
     decay_steps=10000,
     end_learning_rate=config.init_lr/100,
     power=0.5)
+
 optimizer = tf.keras.optimizers.Adam(
     learning_rate=learning_rate_fn, beta_1=0.9, beta_2=0.999, epsilon=1e-07)
+
 
 def gaussian_kernel(kernel_size, std):
     gkern1d = signal.gaussian(kernel_size, std=std).reshape(kernel_size, 1)
     gkern2d = np.outer(gkern1d, gkern1d)
     return gkern2d/np.power(kernel_size, 2)
+
 
 def blur_mse_loss(y_true, y_pred):
     kernel_size = 7
@@ -76,24 +81,24 @@ def blur_mse_loss(y_true, y_pred):
     l2loss = keras.losses.mean_squared_error(blurred_y_true, blurred_y_pred)
     
     l1loss = keras.losses.mean_absolute_error(y_pred, tf.zeros_like(y_pred))
-    return l2loss+ 1e-5*l1loss
+    return l2loss + config.lamda*l1loss
 
 
-#%%
-reduce_lr = tf.keras.callbacks.ReduceLROnPlateau(monitor='val_loss',
-                                                 factor=0.1,
-                                                 patience=5,
-                                                 min_delta=5e-4,
-                                                 min_lr=0.000001)
-model.compile(loss='MSE', optimizer=optimizer, metrics=['mse'])
-# model.compile(loss=blur_mse_loss, optimizer=optimizer)
-# model.summary()
+def mse_plus_reg(y_true, y_pred):
+    l2loss = keras.losses.mean_squared_error(y_true, y_pred)
+    
+    l1loss = keras.losses.mean_absolute_error(y_pred, tf.zeros_like(y_pred))
+    return l2loss + config.lamda*l1loss
 
-model.fit(traingen,
-          validation_data=testgen,
-          epochs=config.epochs,
-          shuffle=False,
-          workers=8)
+
+def get_loss():
+    if config.loss == "blur":
+        return blur_mse_loss
+    elif config.loss == "mse-r":
+        return mse_plus_reg
+    else:
+        print("Assuming that you are using a predefined loss")
+        return config.loss
 
 #%%
 # model.layers[1].trainable = True
@@ -102,38 +107,21 @@ model.fit(traingen,
 #                                                  patience=5,
 #                                                  min_delta=5e-4,
 #                                                  min_lr=0.000001)
-model.compile(loss=blur_mse_loss, optimizer=optimizer, metrics=[blur_mse_loss])
+
+model.compile(loss=get_loss(), optimizer=optimizer, metrics=['val_loss'])
+
 history = model.fit(traingen,
           validation_data=testgen,
           epochs=60,  #config.epochs,
           shuffle=False,
           workers=8)
-          #callbacks=[])
-plot_acc(history, "blur_mse_loss")
+
+plot_acc(history, "val_loss")
 
 #%%
-index = 1
-preds = model.predict(testgen[index][0])
-
-fig, axs = plt.subplots(nrows=3, ncols=8, figsize=(16, 12))
-counter = 0
-for i in range(8):
-    ax = axs[0,counter]
-    ax.axis('off')
-    ax.imshow(testgen[index][0][i,:,:,0], cmap='gray')  # , vmax=0.8
-    ax.set_title(f"Center {counter}")
-    ax = axs[1,counter]
-    ax.axis('off')
-    ax.imshow(testgen[index][1][i,:,:,0], vmin=0.01, vmax=0.4)
-    ax.set_title(f"Ground Truth Green {counter}")
-    ax = axs[2,counter]
-    ax.axis('off')
-    ax.set_title(f"Prediction Green {counter}")
-    ax.imshow(preds[i], vmin=0.01, vmax=0.4)  # , vmin=0.01, vmax=1
-    counter += 1
-plt.show()
+plot_predictions(trained_model=model, testgen=testgen)
 #%%
-index = 12
+# index = 12
 
-inter_output_model = keras.Model(model.input, model.get_layer(index = 1).output)
-inter_output = inter_output_model.predict(testgen[index])
+# inter_output_model = keras.Model(model.input, model.get_layer(index = 1).output)
+# inter_output = inter_output_model.predict(testgen[index])
