@@ -140,8 +140,8 @@ def get_model(img_size,
         x = conv2d_block(inputs=x, filters=filters,
                          use_batch_norm=use_batch_norm)
 
-    outputs = layers.Conv2D(n_out_channels, 
-                            (1, 1), 
+    outputs = layers.Conv2D(n_out_channels,
+                            (1, 1),
                             activation=final_activation)(x)
     # TODO
     # outputs = outputs/2 + 0.5

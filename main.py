@@ -8,6 +8,7 @@ Created on Tue Oct 19 19:12:56 2021
 #%%
 import os
 import model
+import json
 import tensorflow as tf
 # import tensorflow.keras.backend as K
 import numpy as np
@@ -44,7 +45,7 @@ testgen = DataGenerator(num_images=128,
                         random_seed=config.random_seed)
 
 #%%
-model = model.get_model((256,256), config.n_sample, config.n_out_channels,
+model = model.get_model((256, 256), config.n_sample, config.n_out_channels,
                         config.final_activation)
 
 learning_rate_fn = keras.optimizers.schedules.PolynomialDecay(
@@ -66,27 +67,26 @@ def gaussian_kernel(kernel_size, std):
 def blur_mse_loss(y_true, y_pred):
     kernel_size = 7
     std = 1
-    
+
     kernel = tf.constant(gaussian_kernel(kernel_size=kernel_size, std=std),
-                                         shape=[kernel_size,
-                                                kernel_size,
-                                                1, 1],
-                                         dtype=tf.float32)
-    
-    blurred_y_true = tf.nn.conv2d(y_true, kernel, 
-                                  strides=(1,1), padding="SAME")
-    blurred_y_pred = tf.nn.conv2d(y_pred, kernel, 
-                                  strides=(1,1), padding="SAME")
-    
+                         shape=[kernel_size,
+                                kernel_size,
+                                1, 1],
+                         dtype=tf.float32)
+
+    blurred_y_true = tf.nn.conv2d(y_true, kernel,
+                                  strides=(1, 1), padding="SAME")
+    blurred_y_pred = tf.nn.conv2d(y_pred, kernel,
+                                  strides=(1, 1), padding="SAME")
+
     l2loss = keras.losses.mean_squared_error(blurred_y_true, blurred_y_pred)
-    
+
     l1loss = keras.losses.mean_absolute_error(y_pred, tf.zeros_like(y_pred))
     return l2loss + config.lamda*l1loss
 
 
 def mse_plus_reg(y_true, y_pred):
     l2loss = keras.losses.mean_squared_error(y_true, y_pred)
-    
     l1loss = keras.losses.mean_absolute_error(y_pred, tf.zeros_like(y_pred))
     return l2loss + config.lamda*l1loss
 
@@ -100,6 +100,7 @@ def get_loss():
         print("Assuming that you are using a predefined loss")
         return config.loss
 
+
 #%%
 # model.layers[1].trainable = True
 # reduce_lr = tf.keras.callbacks.ReduceLROnPlateau(monitor='val_loss',
@@ -111,14 +112,12 @@ def get_loss():
 model.compile(loss=get_loss(), optimizer=optimizer, metrics=['mse'])
 
 history = model.fit(traingen,
-          validation_data=testgen,
-          epochs=config.epochs,
-          shuffle=False,
-          workers=8)
+                    validation_data=testgen,
+                    epochs=config.epochs,
+                    shuffle=False,
+                    workers=8)
 
 #%%
-import json
-
 current_directory = os.getcwd()
 print("Making a folder in current directory: {}".format(current_directory))
 if not os.path.exists(current_directory+"/"+config.name):
@@ -133,14 +132,13 @@ val_metrics["val_mse_last"] = history.history["val_mse"][-1]
 val_metrics["val_loss_best"] = min(history.history["val_loss"])
 val_metrics["val_loss_best_epoch"] = history.history["val_loss"].index(
                                                 val_metrics["val_loss_best"])
-val_metrics["val_mse_at best_loss"] = history.history["val_mse"]\
-                                        [val_metrics["val_loss_best_epoch"]]
+val_metrics["val_mse_at best_loss"] = history.history["val_mse"][
+                                        val_metrics["val_loss_best_epoch"]]
 val_metrics["val_mse_best"] = min(history.history["val_mse"])
 val_metrics["val_mse_best_epoch"] = history.history["val_mse"].index(
                                                 val_metrics["val_mse_best"])
-val_metrics["val_loss_at best_mse"] = history.history["val_loss"]\
-                                        [val_metrics["val_mse_best_epoch"]]
-
+val_metrics["val_loss_at best_mse"] = history.history["val_loss"][
+                                        val_metrics["val_mse_best_epoch"]]
 
 
 with open('experiment_params.json', 'w') as f:
@@ -152,5 +150,6 @@ plot_predictions(trained_model=model, testgen=testgen)
 #%%
 # index = 12
 
-# inter_output_model = keras.Model(model.input, model.get_layer(index = 1).output)
+# inter_output_model = keras.Model(model.input,
+# model.get_layer(index = 1).output)
 # inter_output = inter_output_model.predict(testgen[index])

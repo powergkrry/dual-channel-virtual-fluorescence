@@ -39,7 +39,6 @@ train_arg.add_argument('--loss', type=str, default="blur",
                             "blur", "mse-r", "mse", "mae"')
 
 
-
 # other params
 misc_arg = add_argument_group('Misc.')
 misc_arg.add_argument('--random_seed', type=int, default=0,
@@ -55,7 +54,8 @@ misc_arg.add_argument('--name', type=str, default="exp",
 
 
 # variance control
-# misc_arg.add_argument('--noise', type=float, default=0.0, help='amount of noise to add to the formed image')
+# misc_arg.add_argument('--noise', type=float, default=0.0,
+#                       help='amount of noise to add to the formed image')
 
 
 def get_config():
