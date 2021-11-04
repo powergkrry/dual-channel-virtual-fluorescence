@@ -116,13 +116,13 @@ history = model.fit(traingen,
           shuffle=False,
           workers=8)
 
-plot_acc(history, "val_loss")
+plot_acc(history, "loss")
 
 #%%
 import json
 
 current_directory = os.getcwd()
-print("Making a folder in current directory: {}".current_directory)
+print("Making a folder in current directory: {}".format(current_directory))
 os.mkdir(current_directory+"/"+config.name)
 os.chdir(current_directory+"/"+config.name)
 
