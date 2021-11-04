@@ -116,8 +116,6 @@ history = model.fit(traingen,
           shuffle=False,
           workers=8)
 
-plot_acc(history, "loss")
-
 #%%
 import json
 
@@ -126,6 +124,8 @@ print("Making a folder in current directory: {}".format(current_directory))
 if not os.path.exists(current_directory+"/"+config.name):
     os.mkdir(current_directory+"/"+config.name)
 os.chdir(current_directory+"/"+config.name)
+
+plot_acc(history, "loss", save=True)
 
 val_metrics = {}
 val_metrics["val_loss_last"] = history.history["val_loss"][-1]
