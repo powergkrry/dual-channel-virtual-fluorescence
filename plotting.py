@@ -2,7 +2,7 @@ from matplotlib import pyplot as plt
 import seaborn as sns
 import pandas as pd
 
-def plot_acc(history, losstype, ax = None, xlabel = 'Epoch #'):
+def plot_acc(history, losstype, ax = None, xlabel = 'Epoch #', save=False):
     history = history.history
     val_error_key = "val_"+losstype
     history.update({'epoch':list(range(len(history[val_error_key])))})
@@ -24,7 +24,10 @@ def plot_acc(history, losstype, ax = None, xlabel = 'Epoch #'):
     ax.set_xlabel(xlabel)
     ax.set_ylabel(losstype+' (Fraction)')
     
-    plt.show()
+    if save:
+      plt.savefig("loss_curve.png")
+    else:
+      plt.show()
 
 
 def plot_predictions(trained_model, testgen):
