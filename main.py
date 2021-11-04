@@ -21,13 +21,13 @@ import matplotlib.pyplot as plt
 
 from plotting import plot_acc, plot_predictions
 
-os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"]="1"
-os.environ['TF_FORCE_GPU_ALLOW_GROWTH'] = 'true'
-
 
 #%%
 config, unparsed = get_config()
+
+os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
+os.environ["CUDA_VISIBLE_DEVICES"] = config.gpu
+os.environ['TF_FORCE_GPU_ALLOW_GROWTH'] = 'true'
 
 traingen = DataGenerator(num_images=704,
                          is_green=config.is_green,
