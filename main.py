@@ -108,7 +108,7 @@ def get_loss():
 #                                                  min_delta=5e-4,
 #                                                  min_lr=0.000001)
 
-model.compile(loss=get_loss(), optimizer=optimizer, metrics=['val_loss'])
+model.compile(loss=get_loss(), optimizer=optimizer, metrics=['mse'])
 
 history = model.fit(traingen,
           validation_data=testgen,
