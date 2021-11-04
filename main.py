@@ -112,13 +112,23 @@ model.compile(loss=get_loss(), optimizer=optimizer, metrics=['val_loss'])
 
 history = model.fit(traingen,
           validation_data=testgen,
-          epochs=60,  #config.epochs,
+          epochs=config.epochs,
           shuffle=False,
           workers=8)
 
 plot_acc(history, "val_loss")
 
 #%%
+import json
+
+current_directory = os.getcwd()
+print("Making a folder in current directory: {}".current_directory)
+os.mkdir(current_directory+"/"+config.name)
+os.chdir(current_directory+"/"+config.name)
+
+with open('experiment_params.json', 'w') as f:
+    json.dump(config.__dict__, f, indent=2)
+
 plot_predictions(trained_model=model, testgen=testgen)
 #%%
 # index = 12
