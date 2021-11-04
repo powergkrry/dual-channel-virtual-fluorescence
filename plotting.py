@@ -51,4 +51,4 @@ def plot_predictions(trained_model, testgen):
             ax.set_title(f"Prediction Green {counter}")
             ax.imshow(preds[i], vmin=0.01, vmax=0.4)  # , vmin=0.01, vmax=1
             counter += 1
-    plt.savefig(str(index)+".png")
+        plt.savefig(str(index)+".png")
