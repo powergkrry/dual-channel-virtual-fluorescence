@@ -37,6 +37,8 @@ train_arg.add_argument('--lamda', type=float, default=1e-4,
 train_arg.add_argument('--loss', type=str, default="blur",
                        help='loss function to use. Choose between:\
                             "blur", "mse-r", "mse", "mae"')
+train_arg.add_argument('--maxpool', action='store_true',
+                       help='whether to use maxpooling over strided conv')
 
 
 # other params

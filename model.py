@@ -115,7 +115,8 @@ def get_model(img_size,
               final_activation,
               filters=32,
               num_layers=4,
-              use_batch_norm=True):
+              use_batch_norm=True,
+              maxpooling=False):
     inputs = keras.Input(shape=img_size + (21,))
     x = inputs
 
@@ -126,7 +127,15 @@ def get_model(img_size,
         x = conv2d_block(inputs=x, filters=filters,
                          use_batch_norm=use_batch_norm)
         down_layers.append(x)
-        x = layers.MaxPooling2D(2)(x)
+        if maxpooling:
+            x = layers.MaxPooling2D(2)(x)
+        else:
+            x = layers.Conv2D(filters,
+                              (2, 2),
+                              strides=(2, 2),
+                              padding='same',
+                              activation='swish',
+                              kernel_initializer='he_normal')(x)
         filters = filters * 2
 
     x = conv2d_block(inputs=x, filters=filters, use_batch_norm=use_batch_norm)

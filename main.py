@@ -46,7 +46,7 @@ testgen = DataGenerator(num_images=128,
 
 #%%
 model = model.get_model((256, 256), config.n_sample, config.n_out_channels,
-                        config.final_activation)
+                        config.final_activation, maxpooling=config.maxpool)
 
 learning_rate_fn = keras.optimizers.schedules.PolynomialDecay(
     initial_learning_rate=config.init_lr,
