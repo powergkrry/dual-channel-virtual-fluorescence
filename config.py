@@ -44,6 +44,8 @@ train_arg.add_argument('--loss', type=str, default="blur",
 misc_arg = add_argument_group('Misc.')
 misc_arg.add_argument('--random_seed', type=int, default=0,
                       help='Seed to ensure reproducibility')
+misc_arg.add_argument('--gpu', type=str, default='1',
+                      help='GPU on the server to use')
 misc_arg.add_argument('--n_sample', type=int, default=21,
                       help='Number of subsample')
 misc_arg.add_argument('--n_out_channels', type=int, default=1,
