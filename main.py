@@ -123,11 +123,30 @@ import json
 
 current_directory = os.getcwd()
 print("Making a folder in current directory: {}".format(current_directory))
-os.mkdir(current_directory+"/"+config.name)
+if not os.path.exists(current_directory+"/"+config.name):
+    os.mkdir(current_directory+"/"+config.name)
 os.chdir(current_directory+"/"+config.name)
+
+val_metrics = {}
+val_metrics["val_loss_last"] = history.history["val_loss"][-1]
+val_metrics["val_mse_last"] = history.history["val_mse"][-1]
+val_metrics["val_loss_best"] = min(history.history["val_loss"])
+val_metrics["val_loss_best_epoch"] = history.history["val_loss"].index(
+                                                val_metrics["val_loss_best"])
+val_metrics["val_mse_at best_loss"] = history.history["val_mse"]\
+                                        [val_metrics["val_loss_best_epoch"]]
+val_metrics["val_mse_best"] = min(history.history["val_mse"])
+val_metrics["val_mse_best_epoch"] = history.history["val_mse"].index(
+                                                val_metrics["val_mse_best"])
+val_metrics["val_loss_at best_mse"] = history.history["val_loss"]\
+                                        [val_metrics["val_mse_best_epoch"]]
+
+
 
 with open('experiment_params.json', 'w') as f:
     json.dump(config.__dict__, f, indent=2)
+with open('validation_mterics.json', 'w') as f:
+    json.dump(val_metrics, f, indent=2)
 
 plot_predictions(trained_model=model, testgen=testgen)
 #%%
