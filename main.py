@@ -66,7 +66,7 @@ elif config.plateaudecay:
     reduce_lr = tf.keras.callbacks.ReduceLROnPlateau(monitor='val_loss',
                                                      factor=0.3162278,
                                                      patience=5,
-                                                     min_delta=5e-4,
+                                                     min_delta=5e-6,
                                                      min_lr=0.00001,
                                                      verbose=1)
     optimizer = tf.keras.optimizers.Adam(learning_rate=config.init_lr,
