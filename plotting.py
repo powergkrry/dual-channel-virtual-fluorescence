@@ -32,7 +32,7 @@ def plot_acc(history, losstype, ax=None, xlabel='Epoch #', save=False):
 
 
 def plot_predictions(trained_model, testgen):
-    for index in range(8):
+    for index in range(16):
         preds = trained_model.predict(testgen[index][0])
 
         fig, axs = plt.subplots(nrows=3, ncols=8, figsize=(16, 12))

@@ -39,7 +39,7 @@ traingen = DataGenerator(num_images=704,
 testgen = DataGenerator(num_images=128,
                         is_train=False,
                         is_green=config.is_green,
-                        batch_size=config.batch_size,
+                        batch_size=config.val_batch_size,
                         n_out_channels=config.n_out_channels,
                         shuffle=config.shuffle,
                         random_seed=config.random_seed)
@@ -102,7 +102,6 @@ def get_loss():
 
 
 #%%
-# model.layers[1].trainable = True
 # reduce_lr = tf.keras.callbacks.ReduceLROnPlateau(monitor='val_loss',
 #                                                  factor=0.1,
 #                                                  patience=5,
@@ -147,9 +146,3 @@ with open('validation_mterics.json', 'w') as f:
     json.dump(val_metrics, f, indent=2)
 
 plot_predictions(trained_model=model, testgen=testgen)
-#%%
-# index = 12
-
-# inter_output_model = keras.Model(model.input,
-# model.get_layer(index = 1).output)
-# inter_output = inter_output_model.predict(testgen[index])

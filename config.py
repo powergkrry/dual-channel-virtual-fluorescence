@@ -18,6 +18,8 @@ def add_argument_group(name):
 data_arg = add_argument_group('Data Params')
 data_arg.add_argument('--batch_size', type=int, default=16,
                       help='# of images in each batch of data')
+data_arg.add_argument('--val_batch_size', type=int, default=8,
+                      help='# of images in each batch of data')
 data_arg.add_argument('--is_green', type=int, default=0,
                       help='Green or Red channel')
 data_arg.add_argument('--shuffle', type=str2bool, default=True,
