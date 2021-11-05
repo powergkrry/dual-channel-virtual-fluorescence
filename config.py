@@ -41,6 +41,10 @@ train_arg.add_argument('--loss', type=str, default="blur",
                             "blur", "mse-r", "mse", "mae"')
 train_arg.add_argument('--maxpool', action='store_true',
                        help='whether to use maxpooling over strided conv')
+train_arg.add_argument('--polydecay', action='store_true',
+                       help='use polynomial learning rate decay')
+train_arg.add_argument('--plateaudecay', action='store_true',
+                       help='use reduce LR on plateau')
 
 
 # other params
