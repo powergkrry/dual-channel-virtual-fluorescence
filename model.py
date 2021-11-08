@@ -112,9 +112,12 @@ def conv2d_block(inputs, filters,
 def get_model(img_size,
               n_sample,
               n_out_channels,
+              final_activation,
+              layer_activation,
               filters=32,
               num_layers=4,
-              use_batch_norm=True):
+              use_batch_norm=True,
+              maxpooling=False):
     inputs = keras.Input(shape=img_size + (21,))
     x = inputs
 
@@ -123,9 +126,18 @@ def get_model(img_size,
     down_layers = []
     for layer_ in range(num_layers):
         x = conv2d_block(inputs=x, filters=filters,
-                         use_batch_norm=use_batch_norm)
+                         use_batch_norm=use_batch_norm,
+                         activation=layer_activation)
         down_layers.append(x)
-        x = layers.MaxPooling2D(2)(x)
+        if maxpooling:
+            x = layers.MaxPooling2D(2)(x)
+        else:
+            x = layers.Conv2D(filters,
+                              (2, 2),
+                              strides=(2, 2),
+                              padding='same',
+                              activation=layer_activation,
+                              kernel_initializer='he_normal')(x)
         filters = filters * 2
 
     x = conv2d_block(inputs=x, filters=filters, use_batch_norm=use_batch_norm)
@@ -139,7 +151,9 @@ def get_model(img_size,
         x = conv2d_block(inputs=x, filters=filters,
                          use_batch_norm=use_batch_norm)
 
-    outputs = layers.Conv2D(n_out_channels, (1, 1), activation="swish")(x)
+    outputs = layers.Conv2D(n_out_channels,
+                            (1, 1),
+                            activation=final_activation)(x)
     # TODO
     # outputs = outputs/2 + 0.5
 
