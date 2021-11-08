@@ -113,6 +113,7 @@ def get_model(img_size,
               n_sample,
               n_out_channels,
               final_activation,
+              layer_activation,
               filters=32,
               num_layers=4,
               use_batch_norm=True,
@@ -125,7 +126,8 @@ def get_model(img_size,
     down_layers = []
     for layer_ in range(num_layers):
         x = conv2d_block(inputs=x, filters=filters,
-                         use_batch_norm=use_batch_norm)
+                         use_batch_norm=use_batch_norm,
+                         activation=layer_activation)
         down_layers.append(x)
         if maxpooling:
             x = layers.MaxPooling2D(2)(x)
@@ -134,7 +136,7 @@ def get_model(img_size,
                               (2, 2),
                               strides=(2, 2),
                               padding='same',
-                              activation='swish',
+                              activation=layer_activation,
                               kernel_initializer='he_normal')(x)
         filters = filters * 2
 

@@ -34,6 +34,8 @@ train_arg.add_argument('--init_lr', type=float, default=1e-3,
                        help='Initial learning rate value')
 train_arg.add_argument('--final_activation', type=str, default="swish",
                        help='Activation function to use in the final layer')
+train_arg.add_argument('--layer_activation', type=str, default="swish",
+                       help='Activation function to use in conv layers')
 train_arg.add_argument('--lamda', type=float, default=1e-4,
                        help='Weight of regularization, if used')
 train_arg.add_argument('--loss', type=str, default="blur",

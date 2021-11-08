@@ -46,7 +46,8 @@ testgen = DataGenerator(num_images=128,
 
 #%%
 model = model.get_model((256, 256), config.n_sample, config.n_out_channels,
-                        config.final_activation, maxpooling=config.maxpool)
+                        config.final_activation, config.layer_activation, 
+                        maxpooling=config.maxpool)
 
 callback = []
 
