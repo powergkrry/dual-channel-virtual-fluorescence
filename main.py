@@ -80,8 +80,7 @@ else:
     optimizer = tf.keras.optimizers.Adam(learning_rate=config.init_lr,
                                          beta_1=0.9,
                                          beta_2=0.999,
-                                         epsilon=1e-07)        
-
+                                         epsilon=1e-07)      
 
 
 def gaussian_kernel(kernel_size, std):
