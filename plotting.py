@@ -1,6 +1,7 @@
 from matplotlib import pyplot as plt
 import seaborn as sns
 import pandas as pd
+import numpy as np
 
 
 def plot_acc(history, losstype, ax=None, xlabel='Epoch #', save=False):
@@ -14,16 +15,16 @@ def plot_acc(history, losstype, ax=None, xlabel='Epoch #', save=False):
 
     if not ax:
         f, ax = plt.subplots(1, 1)
-    sns.lineplot(x='epoch', y=val_error_key,
+    sns.lineplot(x='epoch', y=np.log(np.array(history[val_error_key])),
                  data=history, label='Validation', ax=ax)
-    sns.lineplot(x='epoch', y=losstype,
+    sns.lineplot(x='epoch', y=np.log(np.array(history[losstype])),
                  data=history, label='Training', ax=ax)
     ax.axvline(x=best_epoch, linestyle='--',
                color='green', label='Best Epoch')
     ax.legend(loc=1)
 
     ax.set_xlabel(xlabel)
-    ax.set_ylabel(losstype+' (Fraction)')
+    ax.set_ylabel(losstype)
 
     if save:
         plt.savefig("loss_curve.png")
