@@ -54,7 +54,7 @@ callback = []
 if config.polydecay:
     learning_rate_fn = keras.optimizers.schedules.PolynomialDecay(
         initial_learning_rate=config.init_lr,
-        decay_steps=10000,
+        decay_steps=config.lr_decay_steps,
         end_learning_rate=config.init_lr/config.lr_reduction_factor,
         power=0.5)
 
