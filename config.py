@@ -32,6 +32,8 @@ train_arg.add_argument('--epochs', type=int, default=40,
                        help='# of epochs to train for')
 train_arg.add_argument('--init_lr', type=float, default=1e-3,
                        help='Initial learning rate value')
+train_arg.add_argument('--lr_reduction_factor', type=float, default=100,
+                       help='Ratio of initial learning rate to final')
 train_arg.add_argument('--final_activation', type=str, default="swish",
                        help='Activation function to use in the final layer')
 train_arg.add_argument('--layer_activation', type=str, default="swish",

@@ -55,7 +55,7 @@ if config.polydecay:
     learning_rate_fn = keras.optimizers.schedules.PolynomialDecay(
         initial_learning_rate=config.init_lr,
         decay_steps=10000,
-        end_learning_rate=config.init_lr/100,
+        end_learning_rate=config.init_lr/config.lr_reduction_factor,
         power=0.5)
 
     optimizer = tf.keras.optimizers.Adam(learning_rate=learning_rate_fn,
@@ -64,11 +64,12 @@ if config.polydecay:
                                          epsilon=1e-07)
 
 elif config.plateaudecay:
+    min_lr = config.init_lr/config.lr_reduction_factor
     reduce_lr = tf.keras.callbacks.ReduceLROnPlateau(monitor='val_loss',
                                                      factor=0.3162278,
                                                      patience=5,
-                                                     min_delta=5e-6,
-                                                     min_lr=0.00001,
+                                                     min_delta=5e-5,
+                                                     min_lr=min_lr,
                                                      verbose=1)
     optimizer = tf.keras.optimizers.Adam(learning_rate=config.init_lr,
                                          beta_1=0.9,
