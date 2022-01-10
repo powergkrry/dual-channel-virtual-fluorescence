@@ -63,26 +63,33 @@ def attention_gate(inp_1, inp_2, n_intermediate_filters):
                                strides=(1, 1),
                                padding="same",
                                kernel_initializer="he_normal")(inp_1)
+
     inp_2_conv = layers.Conv2D(n_intermediate_filters,
                                kernel_size=(1, 1),
                                strides=(1, 1),
                                padding="same",
                                kernel_initializer="he_normal")(inp_2)
+
     f = layers.Activation("relu")(layers.add([inp_1_conv, inp_2_conv]))
+
     g = layers.Conv2D(filters=1,
                       kernel_size=(1, 1),
                       strides=(1, 1),
                       padding="same",
                       kernel_initializer="he_normal")(f)
+
     h = layers.Activation("sigmoid")(g)
+
     return layers.multiply([inp_1, h])
 
 
 def attention_concat(conv_below, skip_connection):
     below_filters = conv_below.get_shape().as_list()[-1]
+
     attention_across = attention_gate(skip_connection,
                                       conv_below,
                                       below_filters)
+
     return layers.concatenate([conv_below, attention_across])
 
 
@@ -92,18 +99,22 @@ def conv2d_block(inputs, filters,
                  activation="swish",
                  kernel_initializer="he_normal",
                  padding="same"):
+    
     c = layers.Conv2D(filters,
                       kernel_size,
                       padding=padding,
                       activation=activation,
                       kernel_initializer=kernel_initializer)(inputs)
+    
     if use_batch_norm:
         c = layers.BatchNormalization()(c)
+
     c = layers.Conv2D(filters,
                       kernel_size,
                       padding=padding,
                       activation=activation,
                       kernel_initializer=kernel_initializer)(c)
+    
     if use_batch_norm:
         c = layers.BatchNormalization()(c)
     return c
@@ -118,17 +129,21 @@ def get_model(img_size,
               num_layers=4,
               use_batch_norm=True,
               maxpooling=False):
+
     inputs = keras.Input(shape=img_size + (21,))
     x = inputs
 
     # x = ProbsApproxCatMultiLayer(21, n_sample)(x)
 
     down_layers = []
+
     for layer_ in range(num_layers):
         x = conv2d_block(inputs=x, filters=filters,
                          use_batch_norm=use_batch_norm,
                          activation=layer_activation)
+
         down_layers.append(x)
+
         if maxpooling:
             x = layers.MaxPooling2D(2)(x)
         else:
@@ -138,12 +153,15 @@ def get_model(img_size,
                               padding='same',
                               activation=layer_activation,
                               kernel_initializer='he_normal')(x)
+
         filters = filters * 2
 
     x = conv2d_block(inputs=x, filters=filters, use_batch_norm=use_batch_norm)
 
     for conv in reversed(down_layers):
+
         filters //= 2
+
         x = layers.Conv2DTranspose(filters, (2, 2),
                                    strides=(2, 2), padding="same")(x)
         # x = attention_concat(conv_below=x, skip_connection=conv)
