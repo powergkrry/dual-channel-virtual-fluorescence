@@ -128,12 +128,15 @@ def get_model(img_size,
               filters=32,
               num_layers=4,
               use_batch_norm=True,
-              maxpooling=False):
+              maxpooling=False,
+              attention=False,
+              annealing=False):
 
     inputs = keras.Input(shape=img_size + (21,))
     x = inputs
 
-    # x = ProbsApproxCatMultiLayer(21, n_sample)(x)
+    if annealing is True:
+        x = ProbsApproxCatMultiLayer(21, n_sample)(x)
 
     down_layers = []
 
@@ -164,8 +167,12 @@ def get_model(img_size,
 
         x = layers.Conv2DTranspose(filters, (2, 2),
                                    strides=(2, 2), padding="same")(x)
-        # x = attention_concat(conv_below=x, skip_connection=conv)
-        x = layers.concatenate([x, conv], axis=3)
+        
+        if attention is True:
+            x = attention_concat(conv_below=x, skip_connection=conv)
+        else:
+            x = layers.concatenate([x, conv], axis=3)
+        
         x = conv2d_block(inputs=x, filters=filters,
                          use_batch_norm=use_batch_norm)
 

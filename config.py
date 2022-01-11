@@ -41,6 +41,11 @@ train_arg.add_argument('--loss', type=str, default="blur",
                             "blur", "mse-r", "mse", "mae"')
 train_arg.add_argument('--maxpool', action='store_true',
                        help='whether to use maxpooling over strided conv')
+train_arg.add_argument('--att', action='store_true',
+                       help='whether to use attention while concatenation')
+train_arg.add_argument('--ann', action='store_true',
+                       help='whether to use annealing for the physical layer')
+
 # learning rate params
 lr_args = add_argument_group('Learning Rate Params')
 lr_args.add_argument('--init_lr', type=float, default=1e-3,
