@@ -35,6 +35,10 @@ def blur_mse_loss(y_true, y_pred):
     return l2loss + config.lamda*l1loss
 
 
+def ssim_loss(y_true, y_pred):
+  return tf.reduce_mean(tf.image.ssim(y_true, y_pred, 2.0))
+
+
 def mse_plus_reg(y_true, y_pred):
     l2loss = keras.losses.mean_squared_error(y_true, y_pred)
     l1loss = keras.losses.mean_absolute_error(y_pred, tf.zeros_like(y_pred))
