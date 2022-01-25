@@ -35,7 +35,7 @@ def blur_mse_loss(y_true, y_pred):
     return l2loss + config.lamda*l1loss
 
 
-def ssim_loss(y_true, y_pred):
+def ssim(y_true, y_pred):
   return tf.reduce_mean(tf.image.ssim(y_true, y_pred, 2.0))
 
 
