@@ -3,7 +3,7 @@
 This is the code to train a U-Net inspired architecture to predict two channel fluorescence images from a multi-LED illuminated stack of TB bacteria images.
 To use the code, run main.py with command line options like follows. The summary of the available options can be found in `config.py`. 
 ```
- python main.py --epochs 700 --polydecay --name exp_newdata_mae_700_poly --gpu 2 --loss mae --polydecay --lr_reduction_factor 1000 --lr_reduction_steps 25000
+ python main.py --epochs 700 --polydecay --name exp_newdata_mae_700_poly --gpu 2 --loss mae --lr_reduction_factor 1000 --lr_reduction_steps 25000
 ```
 At the end of the run, a folder is
 created to save validation images, a loss curve over epochs, validation metrics and the list of parameters provided which may look like this:
