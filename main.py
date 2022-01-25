@@ -11,6 +11,7 @@ import model
 import json
 import losses
 import tensorflow as tf
+from tensorflow import keras
 # import tensorflow.keras.backend as K
 from config import get_config
 from custom_data_gen import DataGenerator
