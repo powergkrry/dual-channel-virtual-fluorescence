@@ -86,7 +86,8 @@ else:
 
 
 #%%
-model.compile(loss=losses.get_loss(), optimizer=optimizer, metrics=['mse'])
+model.compile(loss=losses.get_loss(), optimizer=optimizer, 
+              metrics=['mse', losses.ssim])
 
 history = model.fit(traingen,
                     validation_data=testgen,
