@@ -36,7 +36,7 @@ def blur_mse_loss(y_true, y_pred):
 
 
 def ssim(y_true, y_pred):
-  return tf.reduce_mean(tf.image.ssim(y_true, y_pred, 2.0))
+  return tf.reduce_mean(tf.image.ssim(y_true, y_pred, 1.0))
 
 
 def mse_plus_reg(y_true, y_pred):
