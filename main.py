@@ -9,13 +9,12 @@ Created on Tue Oct 19 19:12:56 2021
 import os
 import model
 import json
+import losses
 import tensorflow as tf
 # import tensorflow.keras.backend as K
-import numpy as np
 from config import get_config
 from custom_data_gen import DataGenerator
-from tensorflow import keras
-from scipy import signal
+
 # from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
 import matplotlib.pyplot as plt
@@ -86,51 +85,8 @@ else:
                                          epsilon=1e-07)      
 
 
-def gaussian_kernel(kernel_size, std):
-    gkern1d = signal.gaussian(kernel_size, std=std).reshape(kernel_size, 1)
-    gkern2d = np.outer(gkern1d, gkern1d)
-    return gkern2d/np.power(kernel_size, 2)
-
-
-def blur_mse_loss(y_true, y_pred):
-    kernel_size = 7
-    std = 1
-
-    kernel = tf.constant(gaussian_kernel(kernel_size=kernel_size, std=std),
-                         shape=[kernel_size,
-                                kernel_size,
-                                1, 1],
-                         dtype=tf.float32)
-
-    blurred_y_true = tf.nn.conv2d(y_true, kernel,
-                                  strides=(1, 1), padding="SAME")
-    blurred_y_pred = tf.nn.conv2d(y_pred, kernel,
-                                  strides=(1, 1), padding="SAME")
-
-    l2loss = keras.losses.mean_squared_error(blurred_y_true, blurred_y_pred)
-
-    l1loss = keras.losses.mean_absolute_error(y_pred, tf.zeros_like(y_pred))
-    return l2loss + config.lamda*l1loss
-
-
-def mse_plus_reg(y_true, y_pred):
-    l2loss = keras.losses.mean_squared_error(y_true, y_pred)
-    l1loss = keras.losses.mean_absolute_error(y_pred, tf.zeros_like(y_pred))
-    return l2loss + config.lamda*l1loss
-
-
-def get_loss():
-    if config.loss == "blur":
-        return blur_mse_loss
-    elif config.loss == "mse-r":
-        return mse_plus_reg
-    else:
-        print("Assuming that you are using a predefined loss")
-        return config.loss
-
-
 #%%
-model.compile(loss=get_loss(), optimizer=optimizer, metrics=['mse'])
+model.compile(loss=losses.get_loss(), optimizer=optimizer, metrics=['mse'])
 
 history = model.fit(traingen,
                     validation_data=testgen,
