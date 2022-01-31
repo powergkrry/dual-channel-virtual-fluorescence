@@ -113,8 +113,8 @@ val_metrics["ssim_last"] = history.history["ssim"][-1]
 val_metrics["val_loss_best"] = min(history.history["val_loss"])
 val_metrics["val_loss_best_epoch"] = history.history["val_loss"].index(
                                                 val_metrics["val_loss_best"])
-val_metrics["ssim_best_loss"] = history.history["ssim"].index(
-                                                val_metrics["val_loss_best"])
+val_metrics["ssim_best_loss"] = history.history["ssim"][
+                                        val_metrics["val_loss_best_epoch"]]
 val_metrics["val_mse_at best_loss"] = history.history["val_mse"][
                                         val_metrics["val_loss_best_epoch"]]
 val_metrics["val_mse_best"] = min(history.history["val_mse"])

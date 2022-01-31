@@ -16,7 +16,7 @@ from tensorflow.keras.preprocessing.image import ImageDataGenerator
 class DataGenerator(keras.utils.Sequence):
     def __init__(self,
                  num_images,
-                 base_path='/data2/amey/TB/Data/',
+                 base_path='/home/kanghyun_gpu/Desktop/dual-channel-virtual-fluorescence/Data/',
                  is_train=True,
                  is_green=True,
                  batch_size=16,
