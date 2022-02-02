@@ -55,6 +55,38 @@ class DataGenerator(keras.utils.Sequence):
         if self.shuffle is True:
             np.random.shuffle(self.indexes)
 
+    def custom_augmentor_flow_reindex(self, Xy,
+                                      rotation_state, horizontal_flip_state):
+        rotation_reindex = [[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20, 21],
+                            [0,4,1,2,3,11,12,5,6,7,8,9,10,19,20,13,14,15,16,17,18, 21],
+                            [0,3,4,1,2,9,10,11,12,5,6,7,8,17,18,19,20,13,14,15,16, 21],
+                            [0,2,3,4,1,7,8,9,10,11,12,5,6,15,16,17,18,19,20,13,14, 21]]
+        horizontal_flip_reindex = [[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20, 21],
+                                   [0,2,1,4,3,10,9,8,7,6,5,12,11,18,17,16,15,14,13,20,19, 21]]
+        
+        Xy = np.array(list(map(lambda Xy, rotation_state:
+                               Xy[...,rotation_reindex[rotation_state]],
+                               Xy, rotation_state)))
+        Xy = np.array(list(map(lambda Xy, horizontal_flip_state:
+                               Xy[...,horizontal_flip_reindex[horizontal_flip_state]],
+                               Xy, horizontal_flip_state)))
+        
+        return Xy
+    
+    def custom_augmentor_flow_augment(self, Xy,
+                              rotation_state, horizontal_flip_state):
+        Xy = np.array(list(map(lambda Xy, rotation_state:
+                               np.rot90(Xy, rotation_state),
+                               Xy, rotation_state)))
+        Xy = np.array(list(map(lambda Xy, horizontal_flip_state:\
+                               np.flip(Xy, 1) if horizontal_flip_state\
+                                   else Xy,\
+                                       Xy, horizontal_flip_state)))
+        
+        return self.custom_augmentor_flow_reindex(Xy,
+                                    rotation_state=rotation_state,
+                                    horizontal_flip_state=horizontal_flip_state)
+
     def __data_generation(self, indexes):
         X = np.empty((self.batch_size, self.crop_size,
                       self.crop_size, self.n_in_channels))
@@ -74,7 +106,11 @@ class DataGenerator(keras.utils.Sequence):
               mmap_mode='r')
 
         Xy = np.concatenate((X, y), axis=3)
-        Xy_gen = self.augmentor.flow(Xy, batch_size=self.batch_size,
-                                     shuffle=False)
-        Xy = next(Xy_gen)
+        rotation_state = np.random.choice(4, self.batch_size)
+        horizontal_flip_state = np.random.choice(2, self.batch_size)
+        if self.is_train:
+            Xy = self.custom_augmentor_flow_augment(Xy,
+                                    rotation_state=rotation_state,
+                                    horizontal_flip_state=horizontal_flip_state)
+        
         return Xy[..., :self.n_in_channels], Xy[..., self.n_in_channels:]

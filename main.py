@@ -30,13 +30,13 @@ os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
 os.environ["CUDA_VISIBLE_DEVICES"] = config.gpu
 os.environ['TF_FORCE_GPU_ALLOW_GROWTH'] = 'true'
 
-traingen = DataGenerator(num_images=704,
+traingen = DataGenerator(num_images=1078,
                          is_green=config.is_green,
                          batch_size=config.batch_size,
                          n_out_channels=config.n_out_channels,
                          shuffle=config.shuffle,
                          random_seed=config.random_seed)
-testgen = DataGenerator(num_images=128,
+testgen = DataGenerator(num_images=294,
                         is_train=False,
                         is_green=config.is_green,
                         batch_size=config.val_batch_size,
