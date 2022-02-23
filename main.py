@@ -68,7 +68,7 @@ elif config.plateaudecay:
     min_lr = config.init_lr/config.lr_reduction_factor
     reduce_lr = tf.keras.callbacks.ReduceLROnPlateau(monitor='val_loss',
                                                      factor=0.3162278,
-                                                     patience=5,
+                                                     patience=10,
                                                      min_delta=5e-5,
                                                      min_lr=min_lr,
                                                      verbose=1)
