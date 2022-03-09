@@ -58,6 +58,8 @@ lr_args.add_argument('--polydecay', action='store_true',
                        help='use polynomial learning rate decay')
 lr_args.add_argument('--plateaudecay', action='store_true',
                        help='use reduce LR on plateau')
+lr_args.add_argument('--stepdecay', action='store_true',
+                       help='use stepped LR reduction')
 
 
 # other params
