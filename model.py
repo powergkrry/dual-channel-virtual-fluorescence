@@ -62,13 +62,13 @@ def attention_gate(inp_1, inp_2, n_intermediate_filters):
                                kernel_size=(1, 1),
                                strides=(1, 1),
                                padding="same",
-                               kernel_initializer="he_normal")(inp_1)
+                               kernel_initializer="glorot_normal")(inp_1)
 
     inp_2_conv = layers.Conv2D(n_intermediate_filters,
                                kernel_size=(1, 1),
                                strides=(1, 1),
                                padding="same",
-                               kernel_initializer="he_normal")(inp_2)
+                               kernel_initializer="glorot_normal")(inp_2)
 
     f = layers.Activation("relu")(layers.add([inp_1_conv, inp_2_conv]))
 
@@ -76,7 +76,7 @@ def attention_gate(inp_1, inp_2, n_intermediate_filters):
                       kernel_size=(1, 1),
                       strides=(1, 1),
                       padding="same",
-                      kernel_initializer="he_normal")(f)
+                      kernel_initializer="glorot_normal")(f)
 
     h = layers.Activation("sigmoid")(g)
 
@@ -97,7 +97,7 @@ def conv2d_block(inputs, filters,
                  use_batch_norm=True,
                  kernel_size=(3, 3),
                  activation="swish",
-                 kernel_initializer="he_normal",
+                 kernel_initializer="glorot_normal",
                  padding="same"):
     
     c = layers.Conv2D(filters,
@@ -155,7 +155,8 @@ def get_model(img_size,
                               strides=(2, 2),
                               padding='same',
                               activation=layer_activation,
-                              kernel_initializer='he_normal')(x)
+                              kernel_initializer='glorot_normal')(x)
+            x = layers.BatchNormalization()(x)
 
         filters = filters * 2
 
