@@ -9,6 +9,7 @@ Created on Tue Oct 19 19:12:56 2021
 import os
 import model
 import json
+import math
 import losses
 import tensorflow as tf
 from tensorflow import keras
@@ -52,12 +53,20 @@ model = model.get_model((256, 256), config.n_sample, config.n_out_channels,
 
 callback = []
 
+def step_decay(epoch):
+    initial_lrate = config.init_lr
+    drop = 0.75
+    epochs_drop = 20.0
+    lrate = initial_lrate * math.pow(drop,  
+            math.floor((1+epoch)/epochs_drop))
+    return lrate
+
 if config.polydecay:
     learning_rate_fn = keras.optimizers.schedules.PolynomialDecay(
         initial_learning_rate=config.init_lr,
         decay_steps=config.lr_decay_steps,
         end_learning_rate=config.init_lr/config.lr_reduction_factor,
-        power=0.5)
+        power=0.3162278)
 
     optimizer = tf.keras.optimizers.Adam(learning_rate=learning_rate_fn,
                                          beta_1=0.9,
@@ -67,9 +76,10 @@ if config.polydecay:
 elif config.plateaudecay:
     min_lr = config.init_lr/config.lr_reduction_factor
     reduce_lr = tf.keras.callbacks.ReduceLROnPlateau(monitor='val_loss',
-                                                     factor=0.3162278,
+                                                     factor=0.5,
                                                      patience=10,
-                                                     min_delta=5e-5,
+                                                     cooldown=1,
+                                                     min_delta=5e-6,
                                                      min_lr=min_lr,
                                                      verbose=1)
     optimizer = tf.keras.optimizers.Adam(learning_rate=config.init_lr,
@@ -77,6 +87,14 @@ elif config.plateaudecay:
                                          beta_2=0.999,
                                          epsilon=1e-07)
     callback.append(reduce_lr)
+
+elif config.stepdecay:
+    lrate = keras.callbacks.LearningRateScheduler(step_decay)
+    optimizer = tf.keras.optimizers.Adam(learning_rate=config.init_lr,
+                                         beta_1=0.9,
+                                         beta_2=0.999,
+                                         epsilon=1e-07)
+    callback.append(lrate)
 
 else:
     print("No schedule for optimizer")
