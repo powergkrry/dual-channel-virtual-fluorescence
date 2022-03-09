@@ -55,7 +55,7 @@ callback = []
 
 def step_decay(epoch):
     initial_lrate = config.init_lr
-    drop = 0.75
+    drop = 0.5
     epochs_drop = 20.0
     lrate = initial_lrate * math.pow(drop,  
             math.floor((1+epoch)/epochs_drop))
@@ -123,6 +123,7 @@ if not os.path.exists(current_directory+"/"+config.name):
 os.chdir(current_directory+"/"+config.name)
 
 plot_acc(history, "loss", save=True)
+plot_acc(history, "ssim", save=True, fname="ssim")
 
 val_metrics = {}
 val_metrics["val_loss_last"] = history.history["val_loss"][-1]
