@@ -22,7 +22,7 @@ def plot_acc(history, losstype, ax=None, xlabel='Epoch #', save=False,
                  data=history, label='Training', ax=ax)
     ax.axvline(x=best_epoch, linestyle='--',
                color='green', label='Best Epoch')
-    ax.legend(loc=1)
+    ax.legend(loc=7)
 
     ax.set_xlabel(xlabel)
     ax.set_ylabel(losstype)
