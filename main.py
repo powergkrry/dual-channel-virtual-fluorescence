@@ -124,6 +124,7 @@ os.chdir(current_directory+"/"+config.name)
 
 plot_acc(history, "loss", save=True)
 plot_acc(history, "ssim", save=True, fname="ssim")
+print("Saved in folder "+config.name)
 
 val_metrics = {}
 val_metrics["val_loss_last"] = history.history["val_loss"][-1]

@@ -2,6 +2,8 @@ from tensorflow import keras
 from scipy import signal
 import tensorflow as tf
 import numpy as np
+from tensorflow.keras import layers
+from tensorflow.keras.applications import vgg16
 from config import get_config
 
 
@@ -45,11 +47,44 @@ def mse_plus_reg(y_true, y_pred):
     return l2loss + config.lamda*l1loss
 
 
+class LossNetwork(tf.keras.models.Model):
+    def __init__(self, content_layer = 'block4_conv2'):
+        super(LossNetwork, self).__init__()
+        vgg = vgg16.VGG16(include_top=False, weights='imagenet')
+        vgg.trainable = False
+        model_outputs = vgg.get_layer(content_layer).output
+        self.model = tf.keras.models.Model(vgg.input, model_outputs)
+        # mixed precision float32 output
+        self.linear = layers.Activation('linear', dtype='float32') 
+
+    def call(self, x):
+        # x = vgg16.preprocess_input(x)
+        x = tf.repeat(x, 3, axis=3)
+        x = self.model(x)
+        return self.linear(x)
+
+
+class MSEContentLoss(keras.losses.Loss):
+    def __init__(self) -> None:
+        super().__init__()
+        self.loss_net = LossNetwork()
+
+    def call(self, y_true, y_pred):
+        l2loss = keras.losses.mean_squared_error(y_true, y_pred)
+        content_loss = tf.reduce_mean((self.loss_net(y_true)-self.loss_net(y_pred))**2)
+        return l2loss + config.lamda*content_loss
+
 def get_loss():
     if config.loss == "blur":
         return blur_mse_loss
+
     elif config.loss == "mse-r":
         return mse_plus_reg
+
+    elif config.loss == "mse-c":
+        mse_content_loss = MSEContentLoss()
+        return mse_content_loss
+
     else:
         print("Assuming that you are using a predefined loss")
         return config.loss
