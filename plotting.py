@@ -4,7 +4,8 @@ import pandas as pd
 import numpy as np
 
 
-def plot_acc(history, losstype, ax=None, xlabel='Epoch #', save=False):
+def plot_acc(history, losstype, ax=None, xlabel='Epoch #', save=False, 
+             fname="loss_curve"):
     history = history.history
     val_error_key = "val_"+losstype
     history.update({'epoch': list(range(len(history[val_error_key])))})
@@ -21,13 +22,13 @@ def plot_acc(history, losstype, ax=None, xlabel='Epoch #', save=False):
                  data=history, label='Training', ax=ax)
     ax.axvline(x=best_epoch, linestyle='--',
                color='green', label='Best Epoch')
-    ax.legend(loc=1)
+    ax.legend(loc=7)
 
     ax.set_xlabel(xlabel)
     ax.set_ylabel(losstype)
 
     if save:
-        plt.savefig("loss_curve.png")
+        plt.savefig(fname+".png")
     else:
         plt.show()
 

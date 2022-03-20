@@ -167,20 +167,22 @@ def get_model(img_size,
         filters //= 2
 
         x = layers.Conv2DTranspose(filters, (2, 2),
-                                   strides=(2, 2), padding="same")(x)
+                                   strides=(2, 2), padding="same", 
+                                   activation=layer_activation)(x)
         
         if attention is True:
             x = attention_concat(conv_below=x, skip_connection=conv)
         else:
             x = layers.concatenate([x, conv], axis=3)
         
-        x = conv2d_block(inputs=x, filters=filters,
+        x = conv2d_block(inputs=x, filters=filters, activation=layer_activation,
                          use_batch_norm=use_batch_norm)
 
     outputs = layers.Conv2D(n_out_channels,
                             (1, 1),
                             activation=final_activation)(x)
     # TODO
+    # if tanh
     # outputs = outputs/2 + 0.5
 
     model = keras.Model(inputs, outputs)
