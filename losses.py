@@ -15,6 +15,9 @@ def gaussian_kernel(kernel_size, std):
     gkern2d = np.outer(gkern1d, gkern1d)
     return gkern2d/np.power(kernel_size, 2)
 
+def bce(y_true, y_pred):
+    bce = tf.keras.losses.BinaryCrossentropy()
+    return bce(y_true, y_pred)
 
 def blur_mse_loss(y_true, y_pred):
     kernel_size = 7
@@ -45,7 +48,6 @@ def mse_plus_reg(y_true, y_pred):
     l2loss = keras.losses.mean_squared_error(y_true, y_pred)
     l1loss = keras.losses.mean_absolute_error(y_pred, tf.zeros_like(y_pred))
     return l2loss + config.lamda*l1loss
-
 
 class LossNetwork(tf.keras.models.Model):
     def __init__(self, content_layer = 'block4_conv2'):
@@ -80,6 +82,9 @@ def get_loss():
 
     elif config.loss == "mse-r":
         return mse_plus_reg
+    
+    elif config.loss == "bce":
+        return bce
 
     elif config.loss == "mse-c":
         mse_content_loss = MSEContentLoss()
