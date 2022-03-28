@@ -184,6 +184,7 @@ def get_model(img_size,
     # TODO
     # if tanh
     # outputs = outputs/2 + 0.5
+    outputs = layers.Lambda(lambda x: keras.backend.clip(x, 0, 1))(outputs)
 
     model = keras.Model(inputs, outputs)
     return model
