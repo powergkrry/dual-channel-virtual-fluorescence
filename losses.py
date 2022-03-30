@@ -4,6 +4,7 @@ import tensorflow as tf
 import numpy as np
 from tensorflow.keras import layers
 from tensorflow.keras.applications import vgg16
+import tensorflow_addons as tfa
 from config import get_config
 
 
@@ -17,7 +18,7 @@ def gaussian_kernel(kernel_size, std):
 
 def bce(y_true, y_pred):
     bce = tf.keras.losses.BinaryCrossentropy()
-    return bce(y_true, y_pred)
+    return bce(y_true, y_pred, sample_weight = y_true*1.2+0.5)
 
 def blur_mse_loss(y_true, y_pred):
     kernel_size = 7
@@ -75,6 +76,10 @@ class MSEContentLoss(keras.losses.Loss):
         l2loss = keras.losses.mean_squared_error(y_true, y_pred)
         content_loss = tf.reduce_mean((self.loss_net(y_true)-self.loss_net(y_pred))**2)
         return l2loss + config.lamda*content_loss
+    
+def focal_loss(y_true, y_pred):
+    loss = tfa.losses.sigmoid_focal_crossentropy(y_true, y_pred)
+    return loss
 
 def get_loss():
     if config.loss == "blur":
@@ -89,6 +94,9 @@ def get_loss():
     elif config.loss == "mse-c":
         mse_content_loss = MSEContentLoss()
         return mse_content_loss
+    
+    elif config.loss == "focal":
+        return focal_loss
 
     else:
         print("Assuming that you are using a predefined loss")

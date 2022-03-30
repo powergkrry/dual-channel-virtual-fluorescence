@@ -79,7 +79,7 @@ elif config.plateaudecay:
                                                      factor=0.5,
                                                      patience=10,
                                                      cooldown=1,
-                                                     min_delta=5e-6,
+                                                     min_delta=5e-4,
                                                      min_lr=min_lr,
                                                      verbose=1)
     optimizer = tf.keras.optimizers.Adam(learning_rate=config.init_lr,
@@ -124,6 +124,7 @@ os.chdir(current_directory+"/"+config.name)
 
 plot_acc(history, "loss", save=True)
 plot_acc(history, "ssim", save=True, fname="ssim")
+plot_acc(history, "mse", save=True, fname="mse")
 print("Saved in folder "+config.name)
 
 val_metrics = {}
