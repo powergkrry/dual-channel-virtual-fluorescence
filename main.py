@@ -56,9 +56,9 @@ callback = []
 def step_decay(epoch):
     initial_lrate = config.init_lr
     drop = 0.5
-    epochs_drop = 20.0
+    epochs_drop = 10.0
     lrate = initial_lrate * math.pow(drop,  
-            math.floor((1+epoch)/epochs_drop))
+            math.floor((1+epoch-5)/epochs_drop))
     return lrate
 
 if config.polydecay:

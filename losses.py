@@ -18,7 +18,16 @@ def gaussian_kernel(kernel_size, std):
 
 def bce(y_true, y_pred):
     bce = tf.keras.losses.BinaryCrossentropy()
-    return bce(y_true, y_pred, sample_weight = y_true*1.2+0.5)
+    return bce(y_true, y_pred, sample_weight = y_true*1.35+0.3)
+
+
+def bce_mae(y_true, y_pred):
+    bce = tf.keras.losses.BinaryCrossentropy()(y_true, 
+                                               y_pred, 
+                                               sample_weight = y_true*1.25+0.3)
+    l1loss = keras.losses.mean_absolute_error(y_true, y_pred)
+    return bce + config.lamda*l1loss
+
 
 def blur_mse_loss(y_true, y_pred):
     kernel_size = 7
@@ -77,9 +86,11 @@ class MSEContentLoss(keras.losses.Loss):
         content_loss = tf.reduce_mean((self.loss_net(y_true)-self.loss_net(y_pred))**2)
         return l2loss + config.lamda*content_loss
     
+
 def focal_loss(y_true, y_pred):
     loss = tfa.losses.sigmoid_focal_crossentropy(y_true, y_pred)
     return loss
+
 
 def get_loss():
     if config.loss == "blur":
@@ -90,6 +101,9 @@ def get_loss():
     
     elif config.loss == "bce":
         return bce
+    
+    elif config.loss == "bce-r":
+        return bce_mae
 
     elif config.loss == "mse-c":
         mse_content_loss = MSEContentLoss()
