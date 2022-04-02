@@ -118,14 +118,21 @@ history = model.fit(traingen,
 #%%
 current_directory = os.getcwd()
 print("Making a folder in current directory: {}".format(current_directory))
-if not os.path.exists(current_directory+"/"+config.name):
-    os.mkdir(current_directory+"/"+config.name)
-os.chdir(current_directory+"/"+config.name)
+name = f"is_green_{config.is_green}_epochs_{config.epochs}_final_activation\
+_{config.final_activation}_lamda_{config.lamda}_loss_{config.loss}\
+_sample_weight_mul_{config.sample_weight_mul}_sample_weight_add\
+_{config.sample_weight_add}_init_lr_{config.init_lr}\
+_lr_reduction_factor_{config.lr_reduction_factor}\
+_lr_decay_steps_{config.lr_decay_steps}_polydecay_{config.polydecay}\
+_random_seed_{config.random_seed}"
+if not os.path.exists(current_directory+"/"+name):
+    os.mkdir(current_directory+"/"+name)
+os.chdir(current_directory+"/"+name)
 
 plot_acc(history, "loss", save=True)
 plot_acc(history, "ssim", save=True, fname="ssim")
 plot_acc(history, "mse", save=True, fname="mse")
-print("Saved in folder "+config.name)
+print("Saved in folder "+name)
 
 val_metrics = {}
 val_metrics["val_loss_last"] = history.history["val_loss"][-1]
