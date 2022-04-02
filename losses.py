@@ -18,13 +18,16 @@ def gaussian_kernel(kernel_size, std):
 
 def bce(y_true, y_pred):
     bce = tf.keras.losses.BinaryCrossentropy()
-    return bce(y_true, y_pred, sample_weight = y_true*1.35+0.3)
+    return bce(y_true, y_pred, sample_weight = y_true*config.sample_weight_mul
+                                                     +config.sample_weight_add)
 
 
 def bce_mae(y_true, y_pred):
     bce = tf.keras.losses.BinaryCrossentropy()(y_true, 
                                                y_pred, 
-                                               sample_weight = y_true*1.25+0.3)
+                                               sample_weight = y_true
+                                               *config.sample_weight_mul
+                                               +config.sample_weight_add)
     l1loss = keras.losses.mean_absolute_error(y_true, y_pred)
     return bce + config.lamda*l1loss
 

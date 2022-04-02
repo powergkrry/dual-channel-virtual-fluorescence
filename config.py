@@ -40,6 +40,10 @@ train_arg.add_argument('--loss', type=str, default="blur",
                        help='loss function to use. Choose between:\
                             "blur", "mse-r", "mse", "mae" "bce",\
                              "bce-r", "focal"')
+train_arg.add_argument('--sample_weight_mul', type=float, default=1,
+                       help='Value to multiply with bce sample weight')
+train_arg.add_argument('--sample_weight_add', type=float, default=0,
+                       help='Value to add to bce sample weight')
 train_arg.add_argument('--maxpool', action='store_true',
                        help='whether to use maxpooling over strided conv')
 train_arg.add_argument('--att', action='store_true',
