@@ -52,7 +52,7 @@ class DataGenerator(keras.utils.Sequence):
 
     def on_epoch_end(self):
         self.indexes = np.arange(self.num_images)
-        if self.shuffle is True:
+        if self.shuffle is True and self.is_train is True:
             np.random.shuffle(self.indexes)
 
     def custom_augmentor_flow_reindex(self, Xy,
