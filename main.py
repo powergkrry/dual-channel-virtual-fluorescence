@@ -21,7 +21,7 @@ from custom_data_gen import DataGenerator
 
 import matplotlib.pyplot as plt
 
-from plotting import plot_acc, plot_predictions
+from plotting import plot_acc, plot_predictions, plot_predictions_semantic
 
 
 #%%
@@ -33,6 +33,7 @@ os.environ['TF_FORCE_GPU_ALLOW_GROWTH'] = 'true'
 
 traingen = DataGenerator(num_images=1078,
                          is_green=config.is_green,
+                         is_semantic=config.is_semantic,
                          batch_size=config.batch_size,
                          n_out_channels=config.n_out_channels,
                          shuffle=config.shuffle,
@@ -40,6 +41,7 @@ traingen = DataGenerator(num_images=1078,
 testgen = DataGenerator(num_images=294,
                         is_train=False,
                         is_green=config.is_green,
+                        is_semantic=config.is_semantic,
                         batch_size=config.val_batch_size,
                         n_out_channels=config.n_out_channels,
                         shuffle=config.shuffle,
@@ -124,6 +126,7 @@ _sample_weight_mul_{config.sample_weight_mul}_sample_weight_add\
 _{config.sample_weight_add}_init_lr_{config.init_lr}\
 _lr_reduction_factor_{config.lr_reduction_factor}\
 _lr_decay_steps_{config.lr_decay_steps}_polydecay_{config.polydecay}\
+_is_semantic_{config.is_semantic}\
 _random_seed_{config.random_seed}"
 if not os.path.exists(current_directory+"/"+name):
     os.mkdir(current_directory+"/"+name)
@@ -159,4 +162,7 @@ with open('experiment_params.json', 'w') as f:
 with open('validation_mterics.json', 'w') as f:
     json.dump(val_metrics, f, indent=2)
 
-plot_predictions(trained_model=model, testgen=testgen)
+if config.is_semantic:
+    plot_predictions_semantic(trained_model=model, testgen=testgen)
+else:
+    plot_predictions(trained_model=model, testgen=testgen)

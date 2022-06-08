@@ -24,7 +24,8 @@ data_arg.add_argument('--is_green', type=int, default=0,
                       help='Green or Red channel')
 data_arg.add_argument('--shuffle', type=str2bool, default=True,
                       help='Whether to shuffle the train and valid indices')
-
+data_arg.add_argument('--is_semantic', type=str2bool, default=False,
+                      help='Whether to train virtual FL or semantic segmentation')
 
 # training params
 train_arg = add_argument_group('Training Params')

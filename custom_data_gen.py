@@ -19,6 +19,7 @@ class DataGenerator(keras.utils.Sequence):
                  base_path='/data2/amey/TB/Data/',
                  is_train=True,
                  is_green=True,
+                 is_semantic=False,
                  batch_size=16,
                  crop_size=256,
                  n_in_channels=21,
@@ -34,6 +35,7 @@ class DataGenerator(keras.utils.Sequence):
             if is_train else ImageDataGenerator()
 
         self.is_green = is_green
+        self.is_semantic = is_semantic
         self.batch_size = batch_size
         self.n_in_channels = n_in_channels
         self.n_out_channels = n_out_channels
@@ -100,10 +102,16 @@ class DataGenerator(keras.utils.Sequence):
                 self.base_path, train_test,
                 f'cropped_LED_array_{ID:04d}_{train_test}.npy'),
                 mmap_mode='r')
-            y[i] = np.load(os.path.join(
-              self.base_path, train_test,
-              f'cropped_{green_red}_flu_AIF_array_{ID:04d}_{train_test}.npy'),
-              mmap_mode='r')
+            if self.is_semantic:
+                y[i] = np.load(os.path.join(
+                  self.base_path, train_test,
+                  f'cropped_flu_mask_array_{ID:04d}_{train_test}.npy'),
+                  mmap_mode='r')
+            else:
+                y[i] = np.load(os.path.join(
+                  self.base_path, train_test,
+                  f'cropped_{green_red}_flu_AIF_array_{ID:04d}_{train_test}.npy'),
+                  mmap_mode='r')
 
         Xy = np.concatenate((X, y), axis=3)
         rotation_state = np.random.choice(4, self.batch_size)
