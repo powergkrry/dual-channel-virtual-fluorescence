@@ -51,7 +51,7 @@ testgen = DataGenerator(num_images=294,
 model = model.get_model((256, 256), config.n_sample, config.n_out_channels,
                         config.final_activation, config.layer_activation, 
                         maxpooling=config.maxpool, attention=config.att, 
-                        annealing=config.ann)
+                        annealing=config.ann, is_semantic=config.is_semantic)
 
 callback = []
 
@@ -107,8 +107,12 @@ else:
 
 
 #%%
-model.compile(loss=losses.get_loss(), optimizer=optimizer, 
-              metrics=['mse', losses.ssim])
+if config.is_semantic:
+    model.compile(loss=losses.get_loss(), optimizer=optimizer, 
+                  metrics='mse')
+else:
+    model.compile(loss=losses.get_loss(), optimizer=optimizer, 
+                  metrics=['mse', losses.ssim])
 
 history = model.fit(traingen,
                     validation_data=testgen,
@@ -133,18 +137,21 @@ if not os.path.exists(current_directory+"/"+name):
 os.chdir(current_directory+"/"+name)
 
 plot_acc(history, "loss", save=True)
-plot_acc(history, "ssim", save=True, fname="ssim")
+if not config.is_semantic:
+    plot_acc(history, "ssim", save=True, fname="ssim")
 plot_acc(history, "mse", save=True, fname="mse")
 print("Saved in folder "+name)
 
 val_metrics = {}
 val_metrics["val_loss_last"] = history.history["val_loss"][-1]
 val_metrics["val_mse_last"] = history.history["val_mse"][-1]
-val_metrics["ssim_last"] = history.history["ssim"][-1]
+if not config.is_semantic:
+    val_metrics["ssim_last"] = history.history["ssim"][-1]
 val_metrics["val_loss_best"] = min(history.history["val_loss"])
 val_metrics["val_loss_best_epoch"] = history.history["val_loss"].index(
                                                 val_metrics["val_loss_best"])
-val_metrics["ssim_best_loss"] = history.history["ssim"][
+if not config.is_semantic:
+    val_metrics["ssim_best_loss"] = history.history["ssim"][
                                         val_metrics["val_loss_best_epoch"]]
 val_metrics["val_mse_at best_loss"] = history.history["val_mse"][
                                         val_metrics["val_loss_best_epoch"]]
@@ -153,7 +160,8 @@ val_metrics["val_mse_best_epoch"] = history.history["val_mse"].index(
                                                 val_metrics["val_mse_best"])
 val_metrics["val_loss_at best_mse"] = history.history["val_loss"][
                                         val_metrics["val_mse_best_epoch"]]
-val_metrics["ssim_at best_mse"] = history.history["ssim"][
+if not config.is_semantic:
+    val_metrics["ssim_at best_mse"] = history.history["ssim"][
                                         val_metrics["val_mse_best_epoch"]]
 
 

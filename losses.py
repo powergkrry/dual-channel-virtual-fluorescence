@@ -94,6 +94,10 @@ def focal_loss(y_true, y_pred):
     loss = tfa.losses.sigmoid_focal_crossentropy(y_true, y_pred)
     return loss
 
+def sparse_cat_cross(y_true, y_pred):
+    ssc = keras.losses.SparseCategoricalCrossentropy(from_logits=True)
+    loss = ssc(y_true, y_pred)
+    return loss
 
 def get_loss():
     if config.loss == "blur":
@@ -115,6 +119,9 @@ def get_loss():
     elif config.loss == "focal":
         return focal_loss
 
+    elif config.loss == "scc":
+        return sparse_cat_cross
+    
     else:
         print("Assuming that you are using a predefined loss")
         return config.loss

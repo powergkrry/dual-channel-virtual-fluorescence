@@ -40,7 +40,7 @@ train_arg.add_argument('--lamda', type=float, default=1e-4,
 train_arg.add_argument('--loss', type=str, default="blur",
                        help='loss function to use. Choose between:\
                             "blur", "mse-r", "mse", "mae" "bce",\
-                             "bce-r", "focal"')
+                             "bce-r", "focal", "scc"')
 train_arg.add_argument('--sample_weight_mul', type=float, default=1,
                        help='Value to multiply with bce sample weight')
 train_arg.add_argument('--sample_weight_add', type=float, default=0,

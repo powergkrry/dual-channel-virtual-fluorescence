@@ -130,7 +130,8 @@ def get_model(img_size,
               use_batch_norm=True,
               maxpooling=False,
               attention=False,
-              annealing=False):
+              annealing=False,
+              is_semantic=False):
 
     inputs = keras.Input(shape=img_size + (21,))
     x = inputs
@@ -178,13 +179,19 @@ def get_model(img_size,
         x = conv2d_block(inputs=x, filters=filters, activation=layer_activation,
                          use_batch_norm=use_batch_norm)
 
-    outputs = layers.Conv2D(n_out_channels,
-                            (1, 1),
-                            activation=final_activation)(x)
-    # TODO
-    # if tanh
-    # outputs = outputs/2 + 0.5
-    outputs = layers.Lambda(lambda x: keras.backend.clip(x, 0, 1))(outputs)
+    if is_semantic:
+        # SparseCategoricalCrossentropy loss takes a vector not scalar for y_pred
+        # so output channel needs to be 3 (or # of classes)
+        outputs = layers.Conv2D(3, (1, 1), # TODO: Does this need to be (1,1)?
+                                activation=final_activation)(x)
+    else:
+        outputs = layers.Conv2D(n_out_channels,
+                                (1, 1),
+                                activation=final_activation)(x)
+        # TODO
+        # if tanh
+        # outputs = outputs/2 + 0.5
+        outputs = layers.Lambda(lambda x: keras.backend.clip(x, 0, 1))(outputs)
 
     model = keras.Model(inputs, outputs)
     return model

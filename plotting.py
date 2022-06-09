@@ -59,6 +59,8 @@ def plot_predictions(trained_model, testgen):
 def plot_predictions_semantic(trained_model, testgen):
     for index in range(16):
         preds = trained_model.predict(testgen[index][0])
+        preds = np.argmax(preds, axis=-1)
+        preds = preds[..., np.newaxis]
 
         fig, axs = plt.subplots(nrows=3, ncols=8, figsize=(16, 12))
         counter = 0
