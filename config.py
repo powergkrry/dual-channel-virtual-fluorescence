@@ -51,6 +51,10 @@ train_arg.add_argument('--att', action='store_true',
                        help='whether to use attention while concatenation')
 train_arg.add_argument('--ann', action='store_true',
                        help='whether to use annealing for the physical layer')
+train_arg.add_argument('--class1_weight', type=float, default=1.0,
+                       help='Weight of class1, bacteria')
+train_arg.add_argument('--class2_weight', type=float, default=1.0,
+                       help='Weight of class2, foci')
 
 # learning rate params
 lr_args = add_argument_group('Learning Rate Params')

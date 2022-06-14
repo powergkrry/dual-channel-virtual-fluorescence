@@ -182,8 +182,9 @@ def get_model(img_size,
     if is_semantic:
         # SparseCategoricalCrossentropy loss takes a vector not scalar for y_pred
         # so output channel needs to be 3 (or # of classes)
-        outputs = layers.Conv2D(3, (1, 1), # TODO: Does this need to be (1,1)?
-                                activation=final_activation)(x)
+        outputs = layers.Conv2D(3, (1, 1))(x)
+                                # TODO: Does this need to be (1,1)?
+                                # activation=final_activation is needed?
     else:
         outputs = layers.Conv2D(n_out_channels,
                                 (1, 1),

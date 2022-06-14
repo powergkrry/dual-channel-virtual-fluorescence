@@ -34,6 +34,8 @@ os.environ['TF_FORCE_GPU_ALLOW_GROWTH'] = 'true'
 traingen = DataGenerator(num_images=1078,
                          is_green=config.is_green,
                          is_semantic=config.is_semantic,
+                         class1_weight=config.class1_weight,
+                         class2_weight=config.class2_weight,
                          batch_size=config.batch_size,
                          n_out_channels=config.n_out_channels,
                          shuffle=config.shuffle,
@@ -42,6 +44,8 @@ testgen = DataGenerator(num_images=294,
                         is_train=False,
                         is_green=config.is_green,
                         is_semantic=config.is_semantic,
+                        class1_weight=config.class1_weight,
+                        class2_weight=config.class2_weight,
                         batch_size=config.val_batch_size,
                         n_out_channels=config.n_out_channels,
                         shuffle=config.shuffle,
@@ -131,6 +135,7 @@ _{config.sample_weight_add}_init_lr_{config.init_lr}\
 _lr_reduction_factor_{config.lr_reduction_factor}\
 _lr_decay_steps_{config.lr_decay_steps}_polydecay_{config.polydecay}\
 _is_semantic_{config.is_semantic}\
+_class1_weight_{config.class1_weight}_class2_weight_{config.class2_weight}\
 _random_seed_{config.random_seed}"
 if not os.path.exists(current_directory+"/"+name):
     os.mkdir(current_directory+"/"+name)
